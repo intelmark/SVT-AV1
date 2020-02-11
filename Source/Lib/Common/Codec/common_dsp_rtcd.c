@@ -387,7 +387,6 @@ void setup_common_rtcd_internal(CPU_FLAGS flags) {
     if (flags & HAS_AVX2) eb_av1_convolve_2d_copy_sr = eb_av1_convolve_2d_copy_sr_avx2;
 
     eb_av1_convolve_2d_scale = eb_av1_convolve_2d_scale_c;
-    //if (flags & HAS_SSE4_1) eb_av1_convolve_2d_scale = eb_av1_convolve_2d_scale_sse4_1;
 
     eb_av1_highbd_convolve_2d_copy_sr = eb_av1_highbd_convolve_2d_copy_sr_c;
     if (flags & HAS_AVX2)
@@ -401,7 +400,6 @@ void setup_common_rtcd_internal(CPU_FLAGS flags) {
     if (flags & HAS_AVX2) eb_av1_highbd_convolve_2d_sr = eb_av1_highbd_convolve_2d_sr_avx2;
 
     eb_av1_highbd_convolve_2d_scale = eb_av1_highbd_convolve_2d_scale_c;
-    //if (flags & HAS_SSE4_1) eb_av1_highbd_convolve_2d_scale = eb_av1_highbd_convolve_2d_scale_sse4_1
 
     eb_av1_highbd_jnt_convolve_2d = eb_av1_highbd_jnt_convolve_2d_c;
     if (flags & HAS_AVX2) eb_av1_highbd_jnt_convolve_2d = eb_av1_highbd_jnt_convolve_2d_avx2;
