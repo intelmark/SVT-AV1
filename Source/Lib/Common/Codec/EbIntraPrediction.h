@@ -10,9 +10,6 @@
 #include "EbObject.h"
 #include "EbBlockStructures.h"
 
-//#include "EbModeDecision.h"
-//#include "EbMotionEstimationProcess.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -13,7 +13,6 @@
 #include "EbNeighborArrays.h"
 #include "EbMvMerge.h"
 #include "EbWarpedMotion.h"
-//#include "EbModeDecisionProcess.h"
 
 #ifdef __cplusplus
 extern "C" {
