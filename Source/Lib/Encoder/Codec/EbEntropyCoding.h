@@ -26,7 +26,7 @@
 #include "EbPictureControlSet.h"
 #include "EbCabacContextModel.h"
 #include "EbModeDecision.h"
-#include "EbIntraPrediction.h"
+#include "EbEncIntraPrediction.h"
 #include "EbBitstreamUnit.h"
 #include "EbPacketizationProcess.h"
 #include "EbModeDecisionProcess.h"
@@ -34,6 +34,8 @@
 extern "C" {
 #endif
 
+struct ModeDecisionCandidateBuffer;
+struct ModeDecisionCandidate;
 
 #define MAX_TILE_WIDTH (4096) // Max Tile width in pixels
 #define MAX_TILE_AREA (4096 * 2304) // Maximum tile area in pixels
@@ -57,6 +59,8 @@ extern EbErrorType write_sb(struct EntropyCodingContext *context_ptr, SuperBlock
                             EbPictureBufferDesc *coeff_ptr);
 #endif
 
+extern int get_wedge_params_bits(BlockSize sb_type);
+
 extern EbErrorType encode_slice_finish(EntropyCoder *entropy_coder_ptr);
 
 extern EbErrorType reset_bitstream(EbPtr bitstream_ptr);
@@ -65,7 +69,7 @@ extern EbErrorType reset_entropy_coder(EncodeContext *encode_context_ptr,
                                        EntropyCoder *entropy_coder_ptr, uint32_t qp,
                                        EB_SLICE slice_type);
 
-extern EbErrorType av1_txb_estimate_coeff_bits(
+EbErrorType av1_txb_estimate_coeff_bits(
     struct ModeDecisionContext *md_context, uint8_t allow_update_cdf, FRAME_CONTEXT *ec_ctx,
     PictureControlSet *pcs_ptr, struct ModeDecisionCandidateBuffer *candidate_buffer_ptr,
     uint32_t txb_origin_index, uint32_t txb_chroma_origin_index, EntropyCoder *entropy_coder_ptr,
