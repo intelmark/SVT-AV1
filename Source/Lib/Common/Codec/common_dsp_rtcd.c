@@ -1012,4 +1012,23 @@ void setup_common_rtcd_internal(CPU_FLAGS flags) {
     eb_aom_h_predictor_8x4 = eb_aom_h_predictor_8x4_c;
     if (flags & HAS_SSE2) eb_aom_h_predictor_8x4 = eb_aom_h_predictor_8x4_sse2;
 
+    eb_cdef_find_dir = eb_cdef_find_dir_c;
+    if (flags & HAS_AVX2) eb_cdef_find_dir = eb_cdef_find_dir_avx2;
+
+    eb_cdef_filter_block = eb_cdef_filter_block_c;
+    if (flags & HAS_AVX2) eb_cdef_filter_block = eb_cdef_filter_block_avx2;
+
+    eb_copy_rect8_8bit_to_16bit = eb_copy_rect8_8bit_to_16bit_c;
+    if (flags & HAS_AVX2) eb_copy_rect8_8bit_to_16bit = eb_copy_rect8_8bit_to_16bit_avx2;
+
+    eb_cdef_filter_block_8x8_16 =
+            eb_cdef_filter_block_8x8_16_avx2; // It has no c version, and is only called in parent avx2 function, so it's safe to initialize to avx2 version.
+#ifndef NON_AVX512_SUPPORT
+    if (flags & HAS_AVX512F) {
+        eb_cdef_filter_block_8x8_16 = eb_cdef_filter_block_8x8_16_avx512;
+        eb_av1_compute_stats        = eb_av1_compute_stats_avx512;
+        eb_av1_compute_stats_highbd = eb_av1_compute_stats_highbd_avx512;
+    }
+#endif
+
 }
