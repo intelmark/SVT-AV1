@@ -665,8 +665,34 @@ static void read_stat_from_file(PictureParentControlSet *pcs_ptr, SequenceContro
 }
 
 /***************************************
- * ResourceCoordination Kernel
- ***************************************/
+* Resource Coordination Kernel
+***************************************/
+/*********************************************************************************
+*
+* @brief
+*  The Resource Coordination Process performs two functions,
+*  namely it gathers input data and distributes encoder-setting
+*  changes properly into the encoder pipeline.
+*
+* @par Description:
+*  Input data is passed to the encoder in packets that can contain varying amounts of
+*  data from partial segments of one input pictures to multiple pictures.
+*  The Resource Coordination Process assembles the input data packets into complete frames
+*  and passes this data along with the current encoder settings to the Picture Analysis Processes.
+*  Encoder settings include, but are not limited to Bitrate Settings, Rate Control Mode of operation, etc.
+*
+* @param[in] Packets
+*  Packets can contain varying amounts of data from partial segments of one input picture to multiple pictures
+*
+* @param[out] Frames
+*  Assembled frames
+*
+* @param[out] Settings
+*  Encoder settings include Bitrate Settings, Rate Control Mode of operation, etc. for each set of frames.
+*
+********************************************************************************/
+
+
 void *resource_coordination_kernel(void *input_ptr) {
     EbThreadContext *            enc_contxt_ptr = (EbThreadContext *)input_ptr;
     ResourceCoordinationContext *context_ptr = (ResourceCoordinationContext *)enc_contxt_ptr->priv;

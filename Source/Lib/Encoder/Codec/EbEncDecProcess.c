@@ -2566,9 +2566,35 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
     }
 }
 
-/******************************************************
- * EncDec Kernel
- ******************************************************/
+/* EncDec Kernel */
+
+/*********************************************************************************
+*
+* @brief
+*  The EncDec process currently encapsulates the partitioning decision (PD) stages where
+*  many of the encoder tasks such as Intra Prediction, Motion Compensated Prediction,
+*  Transform, Quantization and Mode Decision are performed.
+*
+* @par Description:
+*  The EncDec process takes as input the Motion Vector XY pairs and corresponding
+*  distortion estimates from the Motion Estimation process, and the picture-level
+*  QP from the Rate Control process. The EncDec process operates on an SB basis.
+*
+* @param[in] Vector
+*  Motion Vector XY pairs from Motion Estimation process
+*
+* @param[in] Distortion Estimates
+*  Distortion estimates from Motion Estimation process
+*
+* @param[in] Picture QP
+*  Picture Quantization Parameter from Rate Control process
+*
+* @param[out] Blocks
+*  The encode pass takes the selected partitioning and coding modes as input from mode decision for each
+*  superblock and produces a quantized transfrom coefficient for the residuals and syntax elements that
+*  would be included in an AV1 conformant bit stream.
+*
+********************************************************************************/
 void *enc_dec_kernel(void *input_ptr) {
     // Context & SCS & PCS
     EbThreadContext *   thread_context_ptr = (EbThreadContext *)input_ptr;
