@@ -12,6 +12,8 @@
 #ifndef EbWarpedMotion_h
 #define EbWarpedMotion_h
 
+#include "EbBlockStructures.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -99,6 +101,7 @@ void warp_plane(EbWarpedMotionParams *wm, const uint8_t *const ref, int width, i
                 int p_stride, int subsampling_x, int subsampling_y,
                 ConvolveParams *conv_params);
 
+int select_samples(MV *mv, int *pts, int *pts_inref, int len, BlockSize bsize);
 
 #ifdef __cplusplus
 }
