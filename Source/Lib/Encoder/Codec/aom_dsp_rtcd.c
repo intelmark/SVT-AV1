@@ -150,8 +150,6 @@ void setup_rtcd_internal(CPU_FLAGS flags) {
     eb_aom_highbd_8_mse16x16 = eb_aom_highbd_8_mse16x16_c;
     if (flags & HAS_SSE2) eb_aom_highbd_8_mse16x16 = eb_aom_highbd_8_mse16x16_sse2;
 
-    eb_av1_warp_affine = eb_av1_warp_affine_c;
-    if (flags & HAS_AVX2) eb_av1_warp_affine = eb_av1_warp_affine_avx2;
 
     //SAD
     eb_aom_sad4x4 = eb_aom_sad4x4_c;
@@ -1182,8 +1180,6 @@ void setup_rtcd_internal(CPU_FLAGS flags) {
                   compute_interm_var_four8x8_helper_sse2,
                   compute_interm_var_four8x8_avx2_intrin);
     SET_AVX2(sad_16b_kernel, sad_16b_kernel_c, sad_16bit_kernel_avx2);
-    SET_SSE41(
-        eb_av1_highbd_warp_affine, eb_av1_highbd_warp_affine_c, eb_av1_highbd_warp_affine_sse4_1);
     SET_AVX2(av1_compute_cross_correlation,
              av1_compute_cross_correlation_c,
              av1_compute_cross_correlation_avx2);

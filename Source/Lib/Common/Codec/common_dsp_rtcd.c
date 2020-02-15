@@ -1031,4 +1031,10 @@ void setup_common_rtcd_internal(CPU_FLAGS flags) {
     }
 #endif
 
+    SET_SSE41(
+            eb_av1_highbd_warp_affine, eb_av1_highbd_warp_affine_c, eb_av1_highbd_warp_affine_sse4_1);
+
+    eb_av1_warp_affine = eb_av1_warp_affine_c;
+    if (flags & HAS_AVX2) eb_av1_warp_affine = eb_av1_warp_affine_avx2;
+
 }
