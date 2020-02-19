@@ -9691,7 +9691,7 @@ void integer_search_sb(
     uint32_t                   sb_origin_y,
     MeContext                 *context_ptr,
     EbPictureBufferDesc       *input_ptr) {
-      EbErrorType return_error = EB_ErrorNone;
+
     SequenceControlSet *scs_ptr = (SequenceControlSet *)pcs_ptr->scs_wrapper_ptr->object_ptr;
     int16_t picture_width = pcs_ptr->aligned_width;
     int16_t picture_height = pcs_ptr->aligned_height;
@@ -9721,8 +9721,6 @@ void integer_search_sb(
     int16_t x_search_center = 0;
     int16_t y_search_center = 0;
     EbPictureBufferDesc *ref_pic_ptr;
-    uint64_t ref_0_poc = 0;
-    uint64_t ref_1_poc = 0;
     num_of_list_to_search =
         (pcs_ptr->slice_type == P_SLICE) ? (uint32_t)REF_LIST_0 : (uint32_t)REF_LIST_1;
     EbBool is_nsq_table_used = (pcs_ptr->pic_depth_mode <= PIC_ALL_C_DEPTH_MODE &&
@@ -9754,7 +9752,6 @@ void integer_search_sb(
 
             reference_object =
                 (EbPaReferenceObject *)pcs_ptr->ref_pa_pic_ptr_array[0][0]->object_ptr;
-            ref_0_poc = pcs_ptr->ref_pic_poc_array[0][0];
         }
 
         // Ref Picture Loop
@@ -9765,7 +9762,6 @@ void integer_search_sb(
                 if (num_of_list_to_search) {
                     reference_object =
                         (EbPaReferenceObject *)pcs_ptr->ref_pa_pic_ptr_array[1][0]->object_ptr;
-                    ref_1_poc = pcs_ptr->ref_pic_poc_array[1][0];
                 }
 
                 reference_object =
@@ -10161,12 +10157,8 @@ void integer_search_sb(
 */
 void prune_references_fp(
     PictureParentControlSet   *picture_control_set_ptr,
-    uint32_t                   sb_index,
-    uint32_t                   sb_origin_x,
-    uint32_t                   sb_origin_y,
-    MeContext                 *context_ptr,
-    EbPictureBufferDesc       *input_ptr
-) {
+    MeContext                 *context_ptr)
+{
     HmeResults sorted[MAX_NUM_OF_REF_PIC_LIST][REF_LIST_MAX_DEPTH];
     uint32_t num_of_cand_to_sort = MAX_NUM_OF_REF_PIC_LIST * REF_LIST_MAX_DEPTH;
     uint8_t list_index, ref_pic_index;
@@ -10243,24 +10235,20 @@ void prune_references_fp(
  *******************************************/
 void hme_sb(
     PictureParentControlSet   *pcs_ptr,
-    uint32_t                   sb_index,
     uint32_t                   sb_origin_x,
     uint32_t                   sb_origin_y,
     MeContext                 *context_ptr,
     EbPictureBufferDesc       *input_ptr
 ){
-    EbErrorType return_error = EB_ErrorNone;
+
     SequenceControlSet *scs_ptr = (SequenceControlSet *)pcs_ptr->scs_wrapper_ptr->object_ptr;
-    int16_t picture_width = pcs_ptr->aligned_width;
-    int16_t picture_height = pcs_ptr->aligned_height;
     uint32_t sb_width = (input_ptr->width - sb_origin_x) < BLOCK_SIZE_64
                             ? input_ptr->width - sb_origin_x
                             : BLOCK_SIZE_64;
     uint32_t sb_height = (input_ptr->height - sb_origin_y) < BLOCK_SIZE_64
                              ? input_ptr->height - sb_origin_y
                              : BLOCK_SIZE_64;
-    int16_t pad_width  = (int16_t)BLOCK_SIZE_64 - 1;
-    int16_t pad_height = (int16_t)BLOCK_SIZE_64 - 1;
+
     int16_t origin_x = (int16_t)sb_origin_x;
     int16_t origin_y = (int16_t)sb_origin_y;
     uint32_t num_of_list_to_search;
@@ -10312,10 +10300,7 @@ void hme_sb(
     EbBool enable_hme_level0_flag = context_ptr->enable_hme_level0_flag;
     EbBool enable_hme_level1_flag = context_ptr->enable_hme_level1_flag;
     EbBool enable_hme_level2_flag = context_ptr->enable_hme_level2_flag;
-    EbBool enable_half_pel_32x32 = EB_FALSE;
-    EbBool enable_half_pel_16x16 = EB_FALSE;
-    EbBool enable_half_pel_8x8   = EB_FALSE;
-    EbBool enable_quarter_pel    = EB_FALSE;
+
     EbBool one_quadrant_hme      = EB_FALSE;
     one_quadrant_hme = scs_ptr->input_resolution < INPUT_SIZE_4K_RANGE ? 0 : one_quadrant_hme;
     num_of_list_to_search =
@@ -10770,13 +10755,8 @@ void hme_sb(
     }
 }
 void prune_references(
-    PictureParentControlSet   *picture_control_set_ptr,
-    uint32_t                   sb_index,
-    uint32_t                   sb_origin_x,
-    uint32_t                   sb_origin_y,
-    MeContext                 *context_ptr,
-    EbPictureBufferDesc       *input_ptr
-) {
+    MeContext                 *context_ptr)
+{
     HmeResults    sorted[MAX_NUM_OF_REF_PIC_LIST][REF_LIST_MAX_DEPTH];
     uint32_t      num_of_cand_to_sort = MAX_NUM_OF_REF_PIC_LIST * REF_LIST_MAX_DEPTH;
     memcpy(sorted, context_ptr->hme_results, sizeof(HmeResults)*MAX_NUM_OF_REF_PIC_LIST*REF_LIST_MAX_DEPTH);
@@ -10832,6 +10812,7 @@ EbErrorType motion_estimate_sb(
 
     int16_t  x_top_left_search_region;
     int16_t  y_top_left_search_region;
+#if !MUS_ME
     uint32_t search_region_index;
 
     int16_t picture_width = pcs_ptr->aligned_width;
@@ -10839,24 +10820,29 @@ EbErrorType motion_estimate_sb(
     uint32_t sb_width = (input_ptr->width - sb_origin_x) < BLOCK_SIZE_64
                             ? input_ptr->width - sb_origin_x
                             : BLOCK_SIZE_64;
+#endif
     uint32_t sb_height = (input_ptr->height - sb_origin_y) < BLOCK_SIZE_64
                              ? input_ptr->height - sb_origin_y
                              : BLOCK_SIZE_64;
-
+#if !MUS_ME
     int16_t pad_width  = (int16_t)BLOCK_SIZE_64 - 1;
     int16_t pad_height = (int16_t)BLOCK_SIZE_64 - 1;
+#endif
 #if !MUS_ME_FP
     int16_t search_area_width;
     int16_t search_area_height;
     int16_t x_search_area_origin;
     int16_t y_search_area_origin;
 #endif
+#if !MUS_ME
     int16_t origin_x = (int16_t)sb_origin_x;
     int16_t origin_y = (int16_t)sb_origin_y;
 
     // HME
+
     uint32_t search_region_number_in_width  = 0;
     uint32_t search_region_number_in_height = 0;
+#endif
 #if !MUS_ME
     int16_t  x_hme_level_0_search_center[EB_HME_SEARCH_AREA_COLUMN_MAX_COUNT]
                                        [EB_HME_SEARCH_AREA_ROW_MAX_COUNT];
@@ -10874,6 +10860,7 @@ EbErrorType motion_estimate_sb(
                                        [EB_HME_SEARCH_AREA_ROW_MAX_COUNT];
     uint64_t hme_level2_sad[EB_HME_SEARCH_AREA_COLUMN_MAX_COUNT][EB_HME_SEARCH_AREA_ROW_MAX_COUNT];
 #endif
+#if !MUS_ME
     // Hierarchical ME Search Center
     int16_t x_hme_search_center = 0;
     int16_t y_hme_search_center = 0;
@@ -10882,9 +10869,10 @@ EbErrorType motion_estimate_sb(
     int16_t x_search_center = 0;
     int16_t y_search_center = 0;
 
+
     // Search Center SADs
     uint64_t hme_mv_sad = 0;
-
+#endif
     uint32_t pu_index;
 
     uint32_t max_number_of_pus_per_sb = pcs_ptr->max_number_of_pus_per_sb;
@@ -10906,9 +10894,10 @@ EbErrorType motion_estimate_sb(
     EbPictureBufferDesc *quarter_ref_pic_ptr;
     EbPictureBufferDesc *sixteenth_ref_pic_ptr;
 #endif
-
+#if !MUS_ME
     int16_t temp_x_hme_search_center = 0;
     int16_t temp_y_hme_search_center = 0;
+#endif
 #if !MUS_ME
     uint32_t num_quad_in_width;
     uint32_t total_me_quad;
@@ -10916,20 +10905,21 @@ EbErrorType motion_estimate_sb(
     uint32_t next_quad_index;
     uint64_t temp_x_hme_sad;
 #endif
-
+#if !MUS_ME
     uint64_t ref_0_poc = 0;
     uint64_t ref_1_poc = 0;
-
+#endif
     uint64_t i;
 #if !MUS_ME
     int16_t hme_level1_search_area_in_width;
     int16_t hme_level1_search_area_in_height;
 #endif
+#if !MUS_ME
     // Configure HME level 0, level 1 and level 2 from static config parameters
     EbBool enable_hme_level0_flag = context_ptr->enable_hme_level0_flag;
     EbBool enable_hme_level1_flag = context_ptr->enable_hme_level1_flag;
     EbBool enable_hme_level2_flag = context_ptr->enable_hme_level2_flag;
-
+#endif
     EbBool enable_half_pel_32x32 = EB_FALSE;
     EbBool enable_half_pel_16x16 = EB_FALSE;
     EbBool enable_half_pel_8x8   = EB_FALSE;
@@ -10976,7 +10966,6 @@ EbErrorType motion_estimate_sb(
     // HME: Perform Hierachical Motion Estimation for all refrence frames.
     hme_sb(
         pcs_ptr,
-        sb_index,
         sb_origin_x,
         sb_origin_y,
         context_ptr,
@@ -10984,12 +10973,7 @@ EbErrorType motion_estimate_sb(
     // prune the refrence frames based on the HME outputs.
     if (pcs_ptr->prune_ref_based_me && prune_ref)
         prune_references(
-            pcs_ptr,
-            sb_index,
-            sb_origin_x,
-            sb_origin_y,
-            context_ptr,
-            input_ptr);
+            context_ptr);
 #if MUS_ME_FP
     // Full pel: Perform the Integer Motion Estimation on the allowed refrence frames.
     integer_search_sb(
@@ -11004,11 +10988,7 @@ EbErrorType motion_estimate_sb(
     if (pcs_ptr->prune_ref_based_me && prune_ref)
         prune_references_fp(
             pcs_ptr,
-            sb_index,
-            sb_origin_x,
-            sb_origin_y,
-            context_ptr,
-            input_ptr );
+            context_ptr );
 #endif
 #endif
 #endif
@@ -11028,7 +11008,9 @@ EbErrorType motion_estimate_sb(
 
             reference_object =
                 (EbPaReferenceObject *)pcs_ptr->ref_pa_pic_ptr_array[0][0]->object_ptr;
+#if !MUS_ME
             ref_0_poc = pcs_ptr->ref_pic_poc_array[0][0];
+#endif
         }
 
         // Ref Picture Loop
@@ -11039,7 +11021,9 @@ EbErrorType motion_estimate_sb(
                 if (num_of_list_to_search) {
                     reference_object =
                         (EbPaReferenceObject *)pcs_ptr->ref_pa_pic_ptr_array[1][0]->object_ptr;
+#if !MUS_ME
                     ref_1_poc = pcs_ptr->ref_pic_poc_array[1][0];
+#endif
                 }
 
                 reference_object =
@@ -11833,8 +11817,10 @@ EbErrorType motion_estimate_sb(
                                 (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) +
                                 y_search_area_origin;
 #endif
+#if !MUS_ME
                             search_region_index = x_top_left_search_region +
                                                   y_top_left_search_region * ref_pic_ptr->stride_y;
+#endif
                             // Interpolate the search region for Half-Pel
                             // Refinements H - AVC Style
                             interpolate_search_region_avc(
@@ -12021,8 +12007,10 @@ EbErrorType motion_estimate_sb(
                     y_top_left_search_region =
                         (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) + y_search_area_origin;
 #endif
+#if !MUS_ME
                     search_region_index =
                         x_top_left_search_region + y_top_left_search_region * ref_pic_ptr->stride_y;
+#endif
 
                     // Interpolate the search region for Half-Pel Refinements
                     // H - AVC Style
