@@ -9681,7 +9681,7 @@ void swap_me_candidate(MePredUnit *a, MePredUnit *b) {
 #if MUS_ME
 #if MUS_ME_FP
 /*******************************************
- *   performs integer search motion estimation for 
+ *   performs integer search motion estimation for
  all avaiable references frames
  *******************************************/
 void integer_search_sb(
@@ -12070,7 +12070,7 @@ EbErrorType motion_estimate_sb(
 #else
                             x_search_area_origin,
                             y_search_area_origin,
-#endif                          
+#endif
                             enable_half_pel_32x32,
                             enable_half_pel_16x16,
                             enable_half_pel_8x8);
@@ -12105,7 +12105,7 @@ EbErrorType motion_estimate_sb(
 #else
                             x_search_area_origin,
                             y_search_area_origin,
-#endif                            
+#endif
                             enable_half_pel_32x32,
                             enable_half_pel_16x16,
                             enable_half_pel_8x8,
