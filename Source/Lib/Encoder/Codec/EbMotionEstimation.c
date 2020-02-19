@@ -10809,10 +10809,10 @@ EbErrorType motion_estimate_sb(
     EbErrorType return_error = EB_ErrorNone;
 
     SequenceControlSet *scs_ptr = (SequenceControlSet *)pcs_ptr->scs_wrapper_ptr->object_ptr;
-
+#if !MUS_ME
     int16_t  x_top_left_search_region;
     int16_t  y_top_left_search_region;
-#if !MUS_ME
+
     uint32_t search_region_index;
 
     int16_t picture_width = pcs_ptr->aligned_width;
@@ -11803,12 +11803,12 @@ EbErrorType motion_estimate_sb(
 #endif
                             // Move to the top left of the search region
 #if MUS_ME_FP
-                            x_top_left_search_region =
-                                (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) +
-                                context_ptr->x_search_area_origin[list_index][ref_pic_index];
-                            y_top_left_search_region =
-                                (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) +
-                                context_ptr->y_search_area_origin[list_index][ref_pic_index];
+                            //x_top_left_search_region =
+                            //    (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) +
+                            //    context_ptr->x_search_area_origin[list_index][ref_pic_index];
+                            //y_top_left_search_region =
+                            //    (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) +
+                            //    context_ptr->y_search_area_origin[list_index][ref_pic_index];
 #else
                             x_top_left_search_region =
                                 (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) +
@@ -11997,10 +11997,10 @@ EbErrorType motion_estimate_sb(
                     // EB_TRUE)) {
                     // Move to the top left of the search region
 #if MUS_ME_FP
-                    x_top_left_search_region =
-                        (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) + context_ptr->x_search_area_origin[list_index][ref_pic_index];
-                    y_top_left_search_region =
-                        (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) + context_ptr->y_search_area_origin[list_index][ref_pic_index];
+                    //x_top_left_search_region =
+                    //    (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) + context_ptr->x_search_area_origin[list_index][ref_pic_index];
+                    //y_top_left_search_region =
+                    //    (int16_t)(ref_pic_ptr->origin_y + sb_origin_y) + context_ptr->y_search_area_origin[list_index][ref_pic_index];
 #else
                     x_top_left_search_region =
                         (int16_t)(ref_pic_ptr->origin_x + sb_origin_x) + x_search_area_origin;
