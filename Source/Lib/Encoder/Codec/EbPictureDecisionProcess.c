@@ -1168,7 +1168,7 @@ EbErrorType signal_derivation_multi_processes_oq(
         //Prune reference and reduce ME SR based on HME/ME distortion
         // 0: OFF
         // 1: ON
-        if (pcs_ptr->sc_content_detected || pcs_ptr->enc_mode <= ENC_M2)
+        if (pcs_ptr->sc_content_detected)
             pcs_ptr->prune_ref_based_me = 0;
         else
             pcs_ptr->prune_ref_based_me = 1;

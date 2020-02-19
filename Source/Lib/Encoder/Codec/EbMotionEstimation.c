@@ -9681,7 +9681,8 @@ void swap_me_candidate(MePredUnit *a, MePredUnit *b) {
 #if MUS_ME
 #if MUS_ME_FP
 /*******************************************
- *   performs full_pel ME
+ *   performs integer search motion estimation for 
+ all avaiable references frames
  *******************************************/
 void integer_search_sb(
     PictureParentControlSet   *pcs_ptr,
@@ -10154,6 +10155,10 @@ void integer_search_sb(
 
 #endif
 #if MUS_ME_FP_SB
+/*
+  using previous stage ME results (Integer Search) for each reference
+  frame. keep only the references that are close to the best reference.
+*/
 void prune_references_fp(
     PictureParentControlSet   *picture_control_set_ptr,
     uint32_t                   sb_index,
@@ -10226,7 +10231,7 @@ void prune_references_fp(
 #if SWITCHED_HALF_PEL_MODE
             if (context_ptr->half_pel_mode == SWITCHABLE_HP_MODE)
                 if (context_ptr->hme_results[li][ri].hme_sad > sorted[0][1].hme_sad)
-                    context_ptr->local_hp_mode[li][ri] = REFINMENT_HP_MODE;
+                    context_ptr->local_hp_mode[li][ri] = REFINEMENT_HP_MODE;
 #endif
         }
     }
@@ -10234,7 +10239,7 @@ void prune_references_fp(
 
 #endif
 /*******************************************
- *   performs hierarchical ME
+ *   performs hierarchical ME for every ref frame
  *******************************************/
 void hme_sb(
     PictureParentControlSet   *pcs_ptr,
@@ -10817,9 +10822,8 @@ EbErrorType motion_estimate_sb(
     uint32_t                 sb_index, // input parameter, SB Index
     uint32_t                 sb_origin_x, // input parameter, SB Origin X
     uint32_t                 sb_origin_y, // input parameter, SB Origin X
-    MeContext
-        *context_ptr, // input parameter, ME Context Ptr, used to store decimated/interpolated SB/SR
-    EbPictureBufferDesc *input_ptr) // input parameter, source Picture Ptr
+    MeContext               *context_ptr, // input parameter, ME Context Ptr, used to store decimated/interpolated SB/SR
+    EbPictureBufferDesc     *input_ptr) // input parameter, source Picture Ptr
 
 {
     EbErrorType return_error = EB_ErrorNone;
@@ -12042,9 +12046,9 @@ EbErrorType motion_estimate_sb(
                     // Interpolate the search region for Half-Pel Refinements
                     // H - AVC Style
 #if SWITCHED_HALF_PEL_MODE
-                    if (context_ptr->half_pel_mode == REFINMENT_HP_MODE || context_ptr->local_hp_mode[list_index][ref_pic_index] == REFINMENT_HP_MODE) {
+                    if (context_ptr->half_pel_mode == REFINEMENT_HP_MODE || context_ptr->local_hp_mode[list_index][ref_pic_index] == REFINMENT_HP_MODE) {
 #else
-                    if (context_ptr->half_pel_mode == REFINMENT_HP_MODE) {
+                    if (context_ptr->half_pel_mode == REFINEMENT_HP_MODE) {
 #endif
                         interpolate_search_region_avc(
                             context_ptr,
@@ -12092,21 +12096,22 @@ EbErrorType motion_estimate_sb(
                             enable_half_pel_8x8);
                     }
 
-                    // Quarter-Pel Refinement [8 search positions]
-                    quarter_pel_search_sb(
-                        context_ptr,
-                        context_ptr->integer_buffer_ptr[list_index][ref_pic_index] +
-                            (ME_FILTER_TAP >> 1) +
-                            ((ME_FILTER_TAP >> 1) *
-                                context_ptr->interpolated_full_stride[list_index][ref_pic_index]),
-                        context_ptr->interpolated_full_stride[list_index][ref_pic_index],
-                        &(context_ptr
-                                ->pos_b_buffer[list_index][ref_pic_index]
-                                            [(ME_FILTER_TAP >> 1) *
-                                                context_ptr->interpolated_stride]), // points to b
-                        // position of
-                        // the figure
-                        // above
+                    if (context_ptr->quarter_pel_mode == REFINEMENT_QP_MODE) {
+                        // Quarter-Pel Refinement [8 search positions]
+                        quarter_pel_search_sb(
+                            context_ptr,
+                            context_ptr->integer_buffer_ptr[list_index][ref_pic_index] +
+                                (ME_FILTER_TAP >> 1) +
+                                ((ME_FILTER_TAP >> 1) *
+                                 context_ptr->interpolated_full_stride[list_index][ref_pic_index]),
+                            context_ptr->interpolated_full_stride[list_index][ref_pic_index],
+                            &(context_ptr
+                                  ->pos_b_buffer[list_index][ref_pic_index]
+                                                [(ME_FILTER_TAP >> 1) *
+                                                 context_ptr->interpolated_stride]), // points to b
+                            // position of
+                            // the figure
+                            // above
 
                             &(context_ptr->pos_h_buffer[list_index][ref_pic_index]
                                                        [1]), // points to h position

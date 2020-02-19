@@ -290,7 +290,7 @@ typedef struct MotionEstimationTierZero {
 #if MUS_ME
 typedef struct HmeResults {
     uint8_t  list_i;   // list index of this ref
-    uint8_t  ref_i;    // ref list lindex of this ref
+    uint8_t  ref_i;    // ref list index of this ref
     int16_t  hme_sc_x; // hme search centre x
     int16_t  hme_sc_y; // hme search centre y
     uint64_t hme_sad;  // hme sad
