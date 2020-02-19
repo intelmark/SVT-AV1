@@ -92,10 +92,6 @@ typedef enum MeHpMode {
     , SWITCHABLE_HP_MODE = 2 // Switch between EX_HP_MODE and REFINEMENT_HP_MODE mode.
 #endif
 } MeHpMode;
-typedef enum MeQpMode {
-    EX_QP_MODE        = 0, // Exhaustive  1/4-pel serach mode.
-    REFINEMENT_QP_MODE = 1 // Refinement 1/4-pel serach mode.
-} MeQpMode;
 #if GLOBAL_WARPED_MOTION
 typedef enum GM_LEVEL {
     GM_FULL      = 0, // Exhaustive search mode.

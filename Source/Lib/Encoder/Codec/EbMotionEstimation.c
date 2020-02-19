@@ -11925,26 +11925,7 @@ EbErrorType motion_estimate_sb(
 #endif
                         }
 
-                        if (context_ptr->quarter_pel_mode == EX_QP_MODE) {
-                            // Quarter-Pel search
-                            memcpy(context_ptr->p_sb_best_full_pel_mv[list_index][ref_pic_index],
-                                   context_ptr->p_sb_best_mv[list_index][ref_pic_index],
-                                   MAX_ME_PU_COUNT * sizeof(uint32_t));
-                            open_loop_me_quarter_pel_search_sblock(context_ptr,
-                                                                   list_index,
-                                                                   ref_pic_index,
-#if MUS_ME_FP
-                                                                   context_ptr->x_search_area_origin[list_index][ref_pic_index],
-                                                                   context_ptr->y_search_area_origin[list_index][ref_pic_index],
-                                                                   context_ptr->sa_width[list_index][ref_pic_index],
-                                                                   context_ptr->sa_height[list_index][ref_pic_index]);
-#else
-                                                                   x_search_area_origin,
-                                                                   y_search_area_origin,
-                                                                   search_area_width,
-                                                                   search_area_height);
-#endif
-                        }
+
                     } else {
                         initialize_buffer_32bits(
                             context_ptr->p_sb_best_sad[list_index][ref_pic_index],
@@ -12089,14 +12070,13 @@ EbErrorType motion_estimate_sb(
 #else
                             x_search_area_origin,
                             y_search_area_origin,
-#endif
-                            pcs_ptr->cu8x8_mode == CU_8x8_MODE_1,
+#endif                          
                             enable_half_pel_32x32,
                             enable_half_pel_16x16,
                             enable_half_pel_8x8);
                     }
 
-                    if (context_ptr->quarter_pel_mode == REFINEMENT_QP_MODE) {
+                    {
                         // Quarter-Pel Refinement [8 search positions]
                         quarter_pel_search_sb(
                             context_ptr,
@@ -12125,8 +12105,7 @@ EbErrorType motion_estimate_sb(
 #else
                             x_search_area_origin,
                             y_search_area_origin,
-#endif
-                            pcs_ptr->cu8x8_mode == CU_8x8_MODE_1,
+#endif                            
                             enable_half_pel_32x32,
                             enable_half_pel_16x16,
                             enable_half_pel_8x8,
