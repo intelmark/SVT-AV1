@@ -61,8 +61,8 @@ int svt_is_interintra_allowed(uint8_t enable_inter_intra, BlockSize sb_type, Pre
            is_interintra_allowed_mode(mode) && is_interintra_allowed_ref(ref_frame);
 }
 #if MUS_ME
-//Given one reference frame identified by the couple (list_index,ref_index)
-//tell if ME data is valid
+//Given one reference frame identified by the pair (list_index,ref_index)
+//indicate if ME data is valid
 uint8_t is_me_data_present(
     struct ModeDecisionContext  *context_ptr,
     const MeSbResults           *me_results,

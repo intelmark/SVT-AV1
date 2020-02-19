@@ -9671,7 +9671,9 @@ static void hme_mv_center_check(EbPictureBufferDesc *ref_pic_ptr, MeContext *con
     *xsc = search_center_x;
     *ysc = search_center_y;
 }
-
+/*
+ swap the content of two MePredUnit structures
+*/
 void swap_me_candidate(MePredUnit *a, MePredUnit *b) {
     MePredUnit temp_ptr;
     temp_ptr = *a;
@@ -11033,6 +11035,8 @@ EbErrorType motion_estimate_sb(
 
             ref_pic_ptr = (EbPictureBufferDesc *)reference_object->input_padded_picture_ptr;
 #if MUS_ME
+            if (ref_pic_ptr == NULL)
+                printf("ERR NULL POINTER");
             if (context_ptr->hme_results[list_index][ref_pic_index].do_ref == 0)
                 continue;  //so will not get ME results for those references. what will happen next, shall we just fill in max sads?
                            //we can also make the ME small and shut subpel
