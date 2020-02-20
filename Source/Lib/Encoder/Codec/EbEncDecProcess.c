@@ -1946,6 +1946,14 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(SequenceControlSet * scs_ptr,
             context_ptr->compound_types_to_try = MD_COMP_AVG;
     }
 #endif
+
+#if  INTRA_SIMILAR
+    //intra_similar_mode
+    //0: OFF
+    //1: If previous similar block is intra, do not inject any inter
+    context_ptr->intra_similar_mode = 1;
+#endif
+
     // Set coeff_based_nsq_cand_reduction
     if (context_ptr->pd_pass == PD_PASS_0)
         context_ptr->coeff_based_nsq_cand_reduction = EB_FALSE;

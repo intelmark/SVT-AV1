@@ -5328,6 +5328,15 @@ EbErrorType signal_derivation_block(
         }
     }
 
+#if INTRA_SIMILAR
+    context_ptr->inject_inter_candidates = 1;
+    if (context_ptr->pd_pass > PD_PASS_1 && context_ptr->similar_blk_avail) {
+        int32_t is_src_intra = similar_cu->pred_mode <= PAETH_PRED;
+        if (context_ptr->intra_similar_mode)
+            context_ptr->inject_inter_candidates = is_src_intra ? 0 : context_ptr->inject_inter_candidates;
+    }
+#endif
+
     return return_error;
 }
 #endif
