@@ -34,6 +34,9 @@
 extern "C" {
 #endif
 
+
+#define COMP_SIMILAR        1 //use previously coded similar blocks to prune compound modes
+
 #define OIS_MEM              1 //reduce memory consumption due to ois struct
 
 
