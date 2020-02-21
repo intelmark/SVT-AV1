@@ -2566,19 +2566,28 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
     }
 }
 
-/* EncDec Kernel */
-
+/* EncDec (Encode Decode) Kernel */
 /*********************************************************************************
 *
 * @brief
-*  The EncDec process currently encapsulates the partitioning decision (PD) stages where
-*  many of the encoder tasks such as Intra Prediction, Motion Compensated Prediction,
-*  Transform, Quantization and Mode Decision are performed.
+*  The EncDec process contains both the mode decision and the encode pass engines
+*  of the encoder. The mode decision encapsulates multiple partitioning decision (PD) stages
+*  and multiple mode decision (MD) stages. At the end of the last mode decision stage,
+*  the winning partition and modes combinations per block get reconstructed in the encode pass
+*  operation which is part of the common section between the encoder and the decoder
+*  Common encoder and decoder tasks such as Intra Prediction, Motion Compensated Prediction,
+*  Transform, Quantization are performed in this process.
 *
 * @par Description:
-*  The EncDec process takes as input the Motion Vector XY pairs and corresponding
-*  distortion estimates from the Motion Estimation process, and the picture-level
-*  QP from the Rate Control process. The EncDec process operates on an SB basis.
+*  The EncDec process operates on an SB basis.
+*  The EncDec process takes as input the Motion Vector XY pairs candidates
+*  and corresponding distortion estimates from the Motion Estimation process,
+*  and the picture-level QP from the Rate Control process. All inputs are passed
+*  through the picture structures: PictureControlSet and SequenceControlSet.
+*  local structures of type EncDecContext and ModeDecisionContext contain all parameters
+*  and results corresponding to the SuperBlock being processed.
+*  each of the context structures is local to on thread and thus there's no risk of
+*  affecting (changing) other SBs data in the process.
 *
 * @param[in] Vector
 *  Motion Vector XY pairs from Motion Estimation process
@@ -2591,8 +2600,8 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
 *
 * @param[out] Blocks
 *  The encode pass takes the selected partitioning and coding modes as input from mode decision for each
-*  superblock and produces a quantized transfrom coefficient for the residuals and syntax elements that
-*  would be included in an AV1 conformant bit stream.
+*  superblock and produces quantized transfrom coefficients for the residuals and the appropriate syntax
+*  elements to be sent to the entropy coding engine
 *
 ********************************************************************************/
 void *enc_dec_kernel(void *input_ptr) {

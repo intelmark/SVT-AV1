@@ -664,35 +664,36 @@ static void read_stat_from_file(PictureParentControlSet *pcs_ptr, SequenceContro
     eb_release_mutex(scs_ptr->encode_context_ptr->stat_file_mutex);
 }
 
-/***************************************
-* Resource Coordination Kernel
-***************************************/
+
+/* Resource Coordination Kernel */
 /*********************************************************************************
 *
 * @brief
-*  The Resource Coordination Process performs two functions,
-*  namely it gathers input data and distributes encoder-setting
-*  changes properly into the encoder pipeline.
+*  The Resource Coordination Process is the first stage that input pictures
+*  this process is a single threaded, picture-based process that handles one picture at a time
+*  in display order
 *
 * @par Description:
-*  Input data is passed to the encoder in packets that can contain varying amounts of
-*  data from partial segments of one input pictures to multiple pictures.
-*  The Resource Coordination Process assembles the input data packets into complete frames
-*  and passes this data along with the current encoder settings to the Picture Analysis Processes.
-*  Encoder settings include, but are not limited to Bitrate Settings, Rate Control Mode of operation, etc.
+*  Input input picture samples are available once the input_buffer_fifo_ptr queue gets any items
+*  The Resource Coordination Process assembles the input information and creates
+*  the appropriate buffers that would travel with the input picture all along
+*  the encoding pipeline and passes this data along with the current encoder settings
+*  to the picture analysis process
+*  Encoder settings include, but are not limited to QPs, picture type, encoding
+*  parameters that change per picture sequence
 *
-* @param[in] Packets
-*  Packets can contain varying amounts of data from partial segments of one input picture to multiple pictures
+* @param[in] EbBufferHeaderType
+*  EbBufferHeaderType containing the input picture samples along with settings specific to that picture
 *
-* @param[out] Frames
-*  Assembled frames
+* @param[out] Input picture in Picture buffers
+*  Initialized picture level (PictureParentControlSet) / sequence level
+*  (SequenceControlSet if it's the initial picture) structures
 *
 * @param[out] Settings
-*  Encoder settings include Bitrate Settings, Rate Control Mode of operation, etc. for each set of frames.
+*  Encoder settings include picture timing and order settings (POC) resolution settings, sequence level
+*  parameters (if it is the initial picture) and other encoding parameters such as QP, Bitrate, picture type ...
 *
 ********************************************************************************/
-
-
 void *resource_coordination_kernel(void *input_ptr) {
     EbThreadContext *            enc_contxt_ptr = (EbThreadContext *)input_ptr;
     ResourceCoordinationContext *context_ptr = (ResourceCoordinationContext *)enc_contxt_ptr->priv;
