@@ -5277,8 +5277,8 @@ void check_redundant_block(const BlockGeom *blk_geom, ModeDecisionContext *conte
 #if COMP_SIMILAR
 /*
    search for a valid previously encoded similar
-   block (block having the same location and shape , but different neighbours
-   as the current block).
+   block (block having the same location and shape as the current block,
+   but where neighboring blocks are different from those for the current block)
 */
 void check_similar_block(const BlockGeom * blk_geom,
     ModeDecisionContext *context_ptr,
@@ -5297,7 +5297,8 @@ void check_similar_block(const BlockGeom * blk_geom,
     }
 }
 /******************************************************
-* Derive md  Settings  at he block level
+* Derive md Settings(feature signals) that could be
+  changed  at the block level
 ******************************************************/
 EbErrorType signal_derivation_block(
     PictureControlSet     *pcs,

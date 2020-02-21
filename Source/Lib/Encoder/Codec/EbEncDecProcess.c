@@ -1926,7 +1926,7 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(SequenceControlSet * scs_ptr,
     //0: OFF
     //1: If previous similar block is not compound, do not inject compound
     //2: If previous similar block is not compound, do not inject compound
-    //   else consider the compound modes up the similar’s one
+    //   else consider the compound modes up the mode for the similar block
     if (pcs_ptr->enc_mode <= ENC_M3)
         context_ptr->comp_similar_mode = 1;
     else
