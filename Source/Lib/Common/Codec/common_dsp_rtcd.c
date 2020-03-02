@@ -1023,13 +1023,6 @@ void setup_common_rtcd_internal(CPU_FLAGS flags) {
 
     eb_cdef_filter_block_8x8_16 =
             eb_cdef_filter_block_8x8_16_avx2; // It has no c version, and is only called in parent avx2 function, so it's safe to initialize to avx2 version.
-#ifndef NON_AVX512_SUPPORT
-    if (flags & HAS_AVX512F) {
-        eb_cdef_filter_block_8x8_16 = eb_cdef_filter_block_8x8_16_avx512;
-        eb_av1_compute_stats        = eb_av1_compute_stats_avx512;
-        eb_av1_compute_stats_highbd = eb_av1_compute_stats_highbd_avx512;
-    }
-#endif
 
     SET_SSE41(
             eb_av1_highbd_warp_affine, eb_av1_highbd_warp_affine_c, eb_av1_highbd_warp_affine_sse4_1);
