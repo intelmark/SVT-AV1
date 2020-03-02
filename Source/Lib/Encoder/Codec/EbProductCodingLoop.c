@@ -8234,7 +8234,7 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
 #if ENHANCED_SQ_WEIGHT
             if (pcs_ptr->parent_pcs_ptr->sb_geom[sb_addr].block_is_allowed[blk_ptr->mds_idx] &&
                 !skip_next_nsq && !skip_next_sq &&
-                !sq_weight_based_nsq_skip && 
+                !sq_weight_based_nsq_skip &&
                 !skip_next_depth) {
 #else
             if (pcs_ptr->parent_pcs_ptr->sb_geom[sb_addr].block_is_allowed[blk_ptr->mds_idx] &&
