@@ -506,6 +506,7 @@ EbErrorType tf_signal_derivation_me_kernel_oq(SequenceControlSet *       scs_ptr
     // 2: perform me nsq_search for the nearest refrenece pictures.
     // 3: me nsq_search off.
     context_ptr->me_context_ptr->inherit_rec_mv_from_sq_block = 0;
+
     return return_error;
 };
 
