@@ -603,8 +603,8 @@ typedef struct PictureParentControlSet {
     uint8_t          ref_list0_count;
     uint8_t          ref_list1_count;
 #if MRP_CTRL
-    uint8_t          ref_list0_count_try;  //the number of references to try (in ME/MD) in list0. should be <= ref_list0_count
-    uint8_t          ref_list1_count_try;  //the number of references to try (in ME/MD) in list1. should be <= ref_list1_count
+    uint8_t          ref_list0_count_try;  //The number of references to try (in ME / MD) in list0.Should be <= ref_list0_count.
+    uint8_t          ref_list1_count_try;  // The number of references to try (in ME/MD) in list1. Should be <= ref_list1_count.
 #endif
     MvReferenceFrame ref_frame_type_arr[MODE_CTX_REF_FRAMES];
     uint8_t          tot_ref_frame_types;
