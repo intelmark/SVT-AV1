@@ -7645,6 +7645,8 @@ uint8_t update_skip_nsq_shapes(SequenceControlSet *scs_ptr, PictureControlSet *p
 #if NSQ_HV
             if (!skip_nsq && context_ptr->nsq_hv_level > 0) {
                 if (local_cu_unit[sqi + 3].avail_blk_flag && local_cu_unit[sqi + 4].avail_blk_flag) {
+
+                    //compute the cost of V partition
                     uint64_t v_cost = local_cu_unit[sqi + 3].default_cost + local_cu_unit[sqi + 4].default_cost;
                     uint32_t offset = 10;
                     if (context_ptr->nsq_hv_level == 2 && context_ptr->blk_geom->shape == PART_H4)
@@ -7652,6 +7654,9 @@ uint8_t update_skip_nsq_shapes(SequenceControlSet *scs_ptr, PictureControlSet *p
                     if (offset >= 5 && scs_ptr->static_config.qp <= 20)
                         offset -= 5;
                     uint32_t v_weight = 100 + offset;
+
+                    //if the cost of H partition is bigger than the V partition by a certain percentage, skip HA/HB
+                    //use 10% to skip HA/HB, use 5% to skip H4, also for very low QP be more aggressive to skip
                     skip_nsq = (h_cost > ((v_cost * v_weight) / 100));
                 }
             }
