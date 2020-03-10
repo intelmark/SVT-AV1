@@ -79,7 +79,11 @@ extern "C" {
 #define MAR10_ADOPTIONS                   1 // Adoptions for all presets
 
 #define CLEANUP_SDEDK                     0 // Cleanup signal derivation enc_dec kernel
-#define USE_MDM5_IN_PD_PASS1              0
+#define ADD_NEW_PD_PASS                   0
+#if ADD_NEW_PD_PASS
+#define ADD_PD_INF                        0 // Lossless
+#define ADD_PD_2                          0 // Insert a PD2 (m5 md preset)
+#endif
 
 
 #endif
@@ -527,6 +531,9 @@ typedef enum PdPass {
     PD_PASS_0,
     PD_PASS_1,
     PD_PASS_2,
+#if ADD_PD_INF
+    PD_PASS_3,
+#endif
     PD_PASS_TOTAL,
 } PdPass;
 typedef enum CandClass {

@@ -1302,11 +1302,10 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
     EbErrorType return_error = EB_ErrorNone;
     uint8_t enc_mode = pcs_ptr->enc_mode;
     uint8_t pd_pass = context_ptr->pd_pass;
-
-#if USE_MDM5_IN_PD_PASS1
-    if (context_ptr->pd_pass == PD_PASS_1) {
+#if ADD_PD_2
+    if (context_ptr->pd_pass == PD_PASS_2) {
         enc_mode = ENC_M5;
-        pd_pass = PD_PASS_2;
+        pd_pass = PD_PASS_3;
     }
 #endif
 
@@ -2034,7 +2033,11 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
     // 0: OFF
     // 1: ON 10% + skip HA/HB/H4  or skip VA/VB/V4
     // 2: ON 10% + skip HA/HB  or skip VA/VB   ,  5% + skip H4  or skip V4
+#if ADD_PD_INF
+    if (MR_MODE || pd_pass < PD_PASS_3)
+#else
     if (MR_MODE || pd_pass < PD_PASS_2)
+#endif
         context_ptr->nsq_hv_level = 0;
 #if MAR4_M6_ADOPTIONS
     else if (enc_mode <= ENC_M5) {
@@ -3070,7 +3073,11 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
     // 0: OFF
     // 1: ON 10% + skip HA/HB/H4  or skip VA/VB/V4
     // 2: ON 10% + skip HA/HB  or skip VA/VB   ,  5% + skip H4  or skip V4
+#if ADD_PD_INF
+    if (MR_MODE || context_ptr->pd_pass < PD_PASS_3)
+#else
     if (MR_MODE || context_ptr->pd_pass < PD_PASS_2)
+#endif
         context_ptr->nsq_hv_level = 0;
 #if MAR4_M6_ADOPTIONS
     else if (pcs_ptr->enc_mode <= ENC_M5) {
@@ -3840,7 +3847,12 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
                             e_depth = 1;
                         }
                     }
-
+#if ADD_PD_2
+                    else if (context_ptr->pd_pass == PD_PASS_2) {
+                            s_depth = 0;
+                            e_depth = 0;
+                    }
+#endif
                     // Add current pred depth block(s)
                     for (block_1d_idx = 0; block_1d_idx < tot_d1_blocks; block_1d_idx++) {
                         results_ptr->leaf_data_array[blk_index + block_1d_idx].consider_block = 1;
@@ -4251,9 +4263,60 @@ void *enc_dec_kernel(void *input_ptr) {
                                                   0,
                                                   sb_origin_x,
                                                   sb_origin_y);
+
+#if ADD_PD_2
+                            // [PD_PASS_2] Signal(s) derivation
+                            context_ptr->md_context->pd_pass = PD_PASS_2;
+                            signal_derivation_enc_dec_kernel_oq(
+                                scs_ptr, pcs_ptr, context_ptr->md_context);
+
+                            // [PD_PASS_1] Mode Decision - Further reduce the number of
+                            // partitions to be considered in later PD stages. This pass uses more accurate
+                            // info than PD0 to give a better PD estimate.
+                            // Input : mdc_blk_ptr built @ PD0 refinement
+                            // Output: md_blk_arr_nsq reduced set of block(s)
+
+                            // PD1 MD Tool(s) : ME and Predictive ME only as INTER candidate(s) but MRP blind (only reference index 0 for motion compensation),
+                            // DC only as INTRA candidate(s)
+                            mode_decision_sb(scs_ptr,
+                                             pcs_ptr,
+                                             mdc_ptr,
+                                             sb_ptr,
+                                             sb_origin_x,
+                                             sb_origin_y,
+                                             sb_index,
+                                             context_ptr->md_context);
+
+                            // Perform Pred_1 depth refinement - Add blocks to be considered in the next stage(s) of PD based on depth cost.
+                            perform_pred_depth_refinement(
+                                scs_ptr, pcs_ptr, context_ptr->md_context, sb_index);
+
+                            // Re-build mdc_blk_ptr for the 3rd PD Pass [PD_PASS_2]
+                            build_cand_block_array(scs_ptr, pcs_ptr, sb_index);
+
+                            // Reset neighnor information to current SB @ position (0,0)
+                            copy_neighbour_arrays(pcs_ptr,
+                                                  context_ptr->md_context,
+                                                  MULTI_STAGE_PD_NEIGHBOR_ARRAY_INDEX,
+                                                  MD_NEIGHBOR_ARRAY_INDEX,
+                                                  0,
+                                                  sb_origin_x,
+                                                  sb_origin_y);
+#endif
                         }
                     }
+#if ADD_PD_INF
+                    // [PD_PASS_3] Signal(s) derivation
+                    context_ptr->md_context->pd_pass = PD_PASS_3;
+                    signal_derivation_enc_dec_kernel_oq(scs_ptr, pcs_ptr, context_ptr->md_context);
 
+                    // [PD_PASS_3] Mode Decision - Obtain the final partitioning decision using more accurate info
+                    // than previous stages.  Reduce the total number of partitions to 1.
+                    // Input : mdc_blk_ptr built @ PD1 refinement
+                    // Output: md_blk_arr_nsq reduced set of block(s)
+
+                    // PD2 MD Tool(s): default MD Tool(s)
+#else
                     // [PD_PASS_2] Signal(s) derivation
                     context_ptr->md_context->pd_pass = PD_PASS_2;
                     signal_derivation_enc_dec_kernel_oq(scs_ptr, pcs_ptr, context_ptr->md_context);
@@ -4264,6 +4327,7 @@ void *enc_dec_kernel(void *input_ptr) {
                     // Output: md_blk_arr_nsq reduced set of block(s)
 
                     // PD2 MD Tool(s): default MD Tool(s)
+#endif
 
                     mode_decision_sb(scs_ptr,
                                      pcs_ptr,
