@@ -4503,7 +4503,7 @@ static void open_loop_me_half_pel_search_sblock(
         list_index,
         ref_pic_index,
         0);
-    
+
     if (pcs_ptr->pic_depth_mode <= PIC_ALL_C_DEPTH_MODE) {
         uint8_t gather_nsq_flag = 0;
         gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 1 && (list_index != context_ptr->best_list_idx || ref_pic_index != context_ptr->best_ref_idx)) ? 1 : gather_nsq_flag;
