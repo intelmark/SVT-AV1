@@ -4503,13 +4503,15 @@ static void open_loop_me_half_pel_search_sblock(
         list_index,
         ref_pic_index,
         0);
-
-    uint8_t gather_nsq_flag = 0;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 1 && (list_index != context_ptr->best_list_idx || ref_pic_index != context_ptr->best_ref_idx)) ? 1 : gather_nsq_flag;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 2 && ref_pic_index) ? 1: gather_nsq_flag;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 3 ) ? 1 : gather_nsq_flag;
-    if(gather_nsq_flag)
-        generate_nsq_mv(context_ptr);
+    
+    if (pcs_ptr->pic_depth_mode <= PIC_ALL_C_DEPTH_MODE) {
+        uint8_t gather_nsq_flag = 0;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 1 && (list_index != context_ptr->best_list_idx || ref_pic_index != context_ptr->best_ref_idx)) ? 1 : gather_nsq_flag;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 2 && ref_pic_index) ? 1 : gather_nsq_flag;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 3) ? 1 : gather_nsq_flag;
+        if (gather_nsq_flag)
+            generate_nsq_mv(context_ptr);
+    }
 }
 
 /*******************************************
@@ -4519,7 +4521,8 @@ static void open_loop_me_fullpel_search_sblock(MeContext *context_ptr, uint32_t 
                                                uint32_t ref_pic_index, int16_t x_search_area_origin,
                                                int16_t  y_search_area_origin,
                                                uint32_t search_area_width,
-                                               uint32_t search_area_height) {
+                                               uint32_t search_area_height,
+                                               uint8_t pic_depth_mode) {
     uint32_t x_search_index, y_search_index;
     uint32_t search_area_width_rest_8 = search_area_width & 7;
     uint32_t search_area_width_mult_8 = search_area_width - search_area_width_rest_8;
@@ -4551,12 +4554,14 @@ static void open_loop_me_fullpel_search_sblock(MeContext *context_ptr, uint32_t 
                 (int32_t)y_search_index + y_search_area_origin);
         }
     }
-    uint8_t gather_nsq_flag = 0;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 1 && (list_index != context_ptr->best_list_idx || ref_pic_index != context_ptr->best_ref_idx)) ? 1 : gather_nsq_flag;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 2 && ref_pic_index) ? 1: gather_nsq_flag;
-    gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 3 ) ? 1 : gather_nsq_flag;
-    if(gather_nsq_flag)
-        generate_nsq_mv(context_ptr);
+    if (pic_depth_mode <= PIC_ALL_C_DEPTH_MODE) {
+        uint8_t gather_nsq_flag = 0;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 1 && (list_index != context_ptr->best_list_idx || ref_pic_index != context_ptr->best_ref_idx)) ? 1 : gather_nsq_flag;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 2 && ref_pic_index) ? 1 : gather_nsq_flag;
+        gather_nsq_flag = (context_ptr->inherit_rec_mv_from_sq_block == 3) ? 1 : gather_nsq_flag;
+        if (gather_nsq_flag)
+            generate_nsq_mv(context_ptr);
+    }
 }
 
 #ifndef AVCCODEL
@@ -9936,7 +9941,8 @@ void integer_search_sb(
                                                            x_search_area_origin,
                                                            y_search_area_origin,
                                                            search_area_width,
-                                                           search_area_height);
+                                                           search_area_height,
+                                                           pcs_ptr->pic_depth_mode);
 
             }
             else {
@@ -11630,7 +11636,8 @@ EbErrorType motion_estimate_sb(
                                                            x_search_area_origin,
                                                            y_search_area_origin,
                                                            search_area_width,
-                                                           search_area_height);
+                                                           search_area_height
+                                                           pcs_ptr->pic_depth_mode);
 #endif
                         context_ptr->full_quarter_pel_refinement = 0;
 #if SWITCHED_HALF_PEL_MODE
