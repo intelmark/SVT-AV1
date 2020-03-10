@@ -75,7 +75,11 @@ extern "C" {
 #endif
 #define HME_PRUNE_BUG_FIX                 1
 #define RATE_MEM_OPT                      1 //lossless memory optimization of rate estimation
+
 #define MAR10_ADOPTIONS                   1 // Adoptions for all presets
+
+#define CLEANUP_SDEDK                     0 // Cleanup signal derivation enc_dec kernel
+#define USE_MDM5_IN_PD_PASS1              0
 
 
 #endif
