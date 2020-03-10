@@ -78,7 +78,7 @@ extern "C" {
 
 #define MAR10_ADOPTIONS                   1 // Adoptions for all presets
 
-#define CLEANUP_SDEDK                     0 // Cleanup signal derivation enc_dec kernel
+#define CLEANUP_SDEDK                     1 // Cleanup signal derivation enc_dec kernel
 #define ADD_NEW_PD_PASS                   0
 #if ADD_NEW_PD_PASS
 #define ADD_PD_INF                        0 // Lossless
