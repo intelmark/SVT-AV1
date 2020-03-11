@@ -95,6 +95,17 @@ extern "C" {
 #define CLEAN_UP_SB_DATA_12  1 // mds index
 #endif
 #define MAR11_ADOPTIONS                   1 // Adoptions for M2, M3, M4, M5
+
+#define CLEANUP_SDEDK                     0 // Cleanup signal derivation enc_dec kernel
+#define ADD_NEW_PD_PASS                   0
+#if ADD_NEW_PD_PASS
+#define ADD_PD_INF                        1 // Lossless
+#define ADD_PD_2                          1 // Insert a PD2 (m5 md preset)
+#define TESTA                             1
+#define TESTB                             0
+#define TESTC                             0
+#endif
+
 #endif
 
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
@@ -540,6 +551,9 @@ typedef enum PdPass {
     PD_PASS_0,
     PD_PASS_1,
     PD_PASS_2,
+#if ADD_PD_INF
+    PD_PASS_3,
+#endif
     PD_PASS_TOTAL,
 } PdPass;
 typedef enum CandClass {

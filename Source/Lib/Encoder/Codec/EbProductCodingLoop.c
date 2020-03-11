@@ -7127,7 +7127,11 @@ EbErrorType signal_derivation_block(
     }
 
     context_ptr->inject_inter_candidates = 1;
+#if ADD_PD_INF
+    if (context_ptr->pd_pass > PD_PASS_2 && context_ptr->similar_blk_avail) {
+#else
     if (context_ptr->pd_pass > PD_PASS_1 && context_ptr->similar_blk_avail) {
+#endif
         int32_t is_src_intra = similar_cu->pred_mode <= PAETH_PRED;
         if (context_ptr->intra_similar_mode)
             context_ptr->inject_inter_candidates = is_src_intra ? 0 : context_ptr->inject_inter_candidates;
@@ -8986,7 +8990,11 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                                ? context_ptr->blk_geom->depth
                                : context_ptr->blk_geom->depth + 1] += nsq_cost[nsq_shape_table[0]];
                 if (context_ptr->skip_depth && scs_ptr->sb_geom[sb_addr].is_complete_sb) {
+#if ADD_PD_INF
+                    if (context_ptr->pd_pass > PD_PASS_2) {
+#else
                     if (context_ptr->pd_pass > PD_PASS_1) {
+#endif
                         uint64_t sq_cost = nsq_cost[0]; // sq cost
                         uint64_t best_nsq_cost = MAX_CU_COST;
 #if !CLEAN_UP_SB_DATA_6
