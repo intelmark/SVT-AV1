@@ -96,7 +96,7 @@ extern "C" {
 #endif
 #define MAR11_ADOPTIONS                   1 // Adoptions for M2, M3, M4, M5
 
-#define CLEANUP_SDEDK                     0 // Cleanup signal derivation enc_dec kernel
+#define CLEANUP_SDEDK                     1 // Cleanup signal derivation enc_dec kernel
 #define ADD_NEW_PD_PASS                   0
 #if ADD_NEW_PD_PASS
 #define ADD_PD_INF                        1 // Lossless
