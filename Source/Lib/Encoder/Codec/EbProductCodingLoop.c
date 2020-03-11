@@ -7771,6 +7771,10 @@ void update_skip_next_nsq_for_a_b_shapes(ModeDecisionContext *context_ptr, uint6
     }
 }
 #endif
+/***********************************
+Mark the blocks of the lower depth
+to be skipped
+***********************************/
 static void set_child_to_be_skipped(
     ModeDecisionContext   *context_ptr,
     uint32_t    blk_index,
