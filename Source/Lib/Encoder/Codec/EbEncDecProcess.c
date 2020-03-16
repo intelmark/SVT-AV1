@@ -2116,11 +2116,7 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(SequenceControlSet * scs_ptr,
         context_ptr->best_me_cand_only_flag = EB_FALSE;
 
     // Set skip_depth
-    if(MR_MODE)
-        context_ptr->skip_depth = 0;
-    else if (context_ptr->pd_pass == PD_PASS_0)
-        context_ptr->skip_depth = 0;
-    else if (context_ptr->pd_pass == PD_PASS_1)
+    if(MR_MODE || context_ptr->pd_pass <= PD_PASS_1)
         context_ptr->skip_depth = 0;
     else
         context_ptr->skip_depth =
