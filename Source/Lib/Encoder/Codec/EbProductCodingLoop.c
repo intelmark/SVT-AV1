@@ -7801,7 +7801,6 @@ static void set_child_to_be_skipped(
     if (context_ptr->md_blk_arr_nsq[blk_index].split_flag && blk_geom->sq_size > 4) {
         //Set first child to be considered
         child_block_idx_1 = blk_index + d1_depth_offset[sb_size == BLOCK_128X128][blk_geom->depth];
-        const BlockGeom * child1_blk_geom = get_blk_geom_mds(child_block_idx_1);
         uint32_t child1_tot_d1_blocks = get_number_of_blocks(child_block_idx_1);
         for (block_1d_idx = 0; block_1d_idx < child1_tot_d1_blocks; block_1d_idx++)
             context_ptr->md_blk_arr_nsq[child_block_idx_1 + block_1d_idx].do_not_process_block = 1;
@@ -7813,7 +7812,6 @@ static void set_child_to_be_skipped(
                 depth_step - 1);
         //Set second child to be considered
         child_block_idx_2 = child_block_idx_1 + ns_depth_offset[sb_size == BLOCK_128X128][blk_geom->depth + 1];
-        const BlockGeom * child2_blk_geom = get_blk_geom_mds(child_block_idx_2);
         uint32_t child2_tot_d1_blocks = get_number_of_blocks(child_block_idx_2);
         for (block_1d_idx = 0; block_1d_idx < child2_tot_d1_blocks; block_1d_idx++)
             context_ptr->md_blk_arr_nsq[child_block_idx_2 + block_1d_idx].do_not_process_block = 1;
@@ -7825,7 +7823,6 @@ static void set_child_to_be_skipped(
                 depth_step - 1);
         //Set third child to be considered
         child_block_idx_3 = child_block_idx_2 + ns_depth_offset[sb_size == BLOCK_128X128][blk_geom->depth + 1];
-        const BlockGeom * child3_blk_geom = get_blk_geom_mds(child_block_idx_3);
         uint32_t child3_tot_d1_blocks = get_number_of_blocks(child_block_idx_3);
         for (block_1d_idx = 0; block_1d_idx < child3_tot_d1_blocks; block_1d_idx++)
             context_ptr->md_blk_arr_nsq[child_block_idx_3 + block_1d_idx].do_not_process_block = 1;
@@ -7837,7 +7834,6 @@ static void set_child_to_be_skipped(
                 depth_step - 1);
         //Set forth child to be considered
         child_block_idx_4 = child_block_idx_3 + ns_depth_offset[sb_size == BLOCK_128X128][blk_geom->depth + 1];
-        const BlockGeom * child4_blk_geom = get_blk_geom_mds(child_block_idx_4);
         uint32_t child4_tot_d1_blocks = get_number_of_blocks(child_block_idx_4);
         for (block_1d_idx = 0; block_1d_idx < child4_tot_d1_blocks; block_1d_idx++)
             context_ptr->md_blk_arr_nsq[child_block_idx_4 + block_1d_idx].do_not_process_block = 1;
