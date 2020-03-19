@@ -136,6 +136,31 @@ extern "C" {
 #define MAR20_ADOPTIONS            1 // Adoptions affecting all modes
 #endif
 
+
+
+#define CLEAN_UP_SKIP_CHROMA_PRED_SIGNAL 1
+#define MD_REFERENCE_MASKING 1
+#if MD_REFERENCE_MASKING
+#define ADD_MVP 1
+#define ADD_INTRA 1
+#define ADD_INTRA_1 1
+#define ADD_INTRA_2 1
+#define NEW_MV_REF_MASKING 1
+#define UNIPRED_3x3_REF_MASKING 1
+#define BIPRED_3x3_REF_MASKING 1
+#define NEW_NEAREST_NEW_NEAR_REF_MASKING 1
+#define WARP_REF_MASKING 1
+#if !ADD_INTRA || ADD_INTRA_2
+#define NEAREST_NEAR_REF_MASKING 1 // **
+#endif
+#if !ADD_INTRA || ADD_INTRA_2
+#define PRED_ME_REF_MASKING 1  // **
+#endif
+#endif
+
+#define MD_MRP_OFF 0
+#endif
+
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
 
 #define COMMON_16BIT 1 // 16Bit pipeline support for common
