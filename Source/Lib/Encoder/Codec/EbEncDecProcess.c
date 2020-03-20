@@ -2109,7 +2109,11 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
 #else
             else if (pcs_ptr->enc_mode <= ENC_M3)
 #endif
+#if SHUT_RDOQ
+                context_ptr->enable_rdoq = EB_FALSE;
+#else
                 context_ptr->enable_rdoq = EB_TRUE;
+#endif
             else
                 context_ptr->enable_rdoq = EB_FALSE;
         else
@@ -2372,8 +2376,12 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
                 context_ptr->sq_weight =
                 sequence_control_set_ptr->static_config.sq_weight + 5;
             else
+#if AGRESSIVE_SQ_WEIGHT
+                context_ptr->sq_weight = 75;
+#else
                 context_ptr->sq_weight =
                 sequence_control_set_ptr->static_config.sq_weight - 5;
+#endif
 
     // nsq_hv_level  needs sq_weight to be ON
     // 0: OFF

@@ -137,6 +137,10 @@ extern "C" {
 #define NIC_INTER_CLASSES_1 0
 #define PRED_DEPTH_ONLY 0
 #define MRP_MD_OFF 0
+
+#define AGRESSIVE_SQ_WEIGHT 0
+#define SHUT_RDOQ 0
+#define FAST_RDOQ 0
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
 
 #define COMMON_16BIT 1 // 16Bit pipeline support for common

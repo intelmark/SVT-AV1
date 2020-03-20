@@ -1457,7 +1457,11 @@ void eb_av1_optimize_b(ModeDecisionContext *md_context, int16_t txb_skip_context
     (void)bit_increment;
     int                    sharpness       = 0; // No Sharpness
     // Perform a fast RDOQ stage for inter and chroma blocks
+#if FAST_RDOQ
+    int                    fast_mode = 1;
+#else
     int                    fast_mode       = (is_inter && plane);
+#endif
     AQ_MODE                aq_mode         = NO_AQ;
     DELTAQ_MODE            deltaq_mode     = NO_DELTA_Q;
     int8_t                 segment_id      = 0;
