@@ -133,14 +133,20 @@ extern "C" {
 #define MAR19_ADOPTIONS            1 // Adoptions for all modes
 #endif
 
+#define MODIFIED_REF 1
 
-#define NIC_INTER_CLASSES_1 0
-#define PRED_DEPTH_ONLY 0
-#define MRP_MD_OFF 0
+#define PRED_DEPTH_ONLY 0 // Depth
+#define NIC_INTER_CLASSES_1 0 // NICS = 1 for INTER
+#define MRP_MD_OFF 0 // MRP OFF
+#define DISALLOW_8x8 0 // disallow_8x8_nsq
+#define DISALLOW_16x16 0 // disallow_16x16_nsq
+#define DISALLOW_NSQ 0
+#define AGRESSIVE_SQ_WEIGHT 0// Aggressive SQ_Weight
+#define SHUT_TXS 0// TXS OFF
+#define SHUT_RDOQ 0// RDOQ OFF
+#define SHUT_TXT 0 // TXT OFF
 
-#define AGRESSIVE_SQ_WEIGHT 0
-#define SHUT_RDOQ 0
-#define FAST_RDOQ 0
+
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
 
 #define COMMON_16BIT 1 // 16Bit pipeline support for common

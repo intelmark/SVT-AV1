@@ -918,7 +918,11 @@ EbErrorType signal_derivation_multi_processes_oq(
 
 
     // Set disallow_nsq
+#if DISALLOW_NSQ
+    pcs_ptr->disallow_nsq = EB_TRUE;
+#else
     pcs_ptr->disallow_nsq = EB_FALSE;
+#endif
     if (!pcs_ptr->disallow_nsq)
         assert(scs_ptr->nsq_present == 1 && "use nsq_present 1");
     pcs_ptr->max_number_of_pus_per_sb =
@@ -943,6 +947,13 @@ EbErrorType signal_derivation_multi_processes_oq(
     pcs_ptr->disallow_4x4 = EB_FALSE;
 
     // Set disallow_all_nsq_blocks_below_8x8: 8x4, 4x8
+#if MODIFIED_REF
+#if DISALLOW_8x8
+    pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_TRUE;
+#else
+    pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_FALSE;
+#endif
+#else
     if (sc_content_detected) {
         pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_FALSE;
     }
@@ -956,10 +967,13 @@ EbErrorType signal_derivation_multi_processes_oq(
         else
             pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_TRUE;
     }
-
+#endif
     // Set disallow_all_nsq_blocks_below_16x16: 16x8, 8x16, 16x4, 4x16
+#if DISALLOW_16x16
+    pcs_ptr->disallow_all_nsq_blocks_below_16x16 = EB_TRUE;
+#else
     pcs_ptr->disallow_all_nsq_blocks_below_16x16 = EB_FALSE;
-
+#endif
     // Set disallow_all_non_hv_nsq_blocks_below_16x16
     pcs_ptr->disallow_all_non_hv_nsq_blocks_below_16x16 = EB_FALSE;
 
@@ -1440,6 +1454,9 @@ EbErrorType signal_derivation_multi_processes_oq(
     else
         pcs_ptr->tx_size_search_mode = 0;
 
+#if SHUT_TXS
+    pcs_ptr->tx_size_search_mode = 0;
+#endif
 #if !INTER_COMP_REDESIGN
     // Set Wedge mode      Settings
     // 0                 FULL: Full search
