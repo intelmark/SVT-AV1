@@ -1371,7 +1371,11 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
             context_ptr->tx_search_level = TX_SEARCH_ENC_DEC;
 #endif
 #if MAR17_ADOPTIONS
+#if MODIFIED_REF
+    else if (pcs_ptr->enc_mode <= ENC_M8)
+#else
     else if (pcs_ptr->enc_mode <= ENC_M7)
+#endif
 #else
     else if (pcs_ptr->enc_mode <= ENC_M4)
 #endif
