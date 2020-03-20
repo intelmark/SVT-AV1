@@ -2868,6 +2868,16 @@ void set_md_stage_counts(PictureControlSet *pcs_ptr, ModeDecisionContext *contex
         }
 #endif
 #endif
+
+
+#if NIC_INTER_CLASSES_1
+        context_ptr->md_stage_1_count[CAND_CLASS_1] = context_ptr->md_stage_2_count[CAND_CLASS_1] = context_ptr->md_stage_3_count[CAND_CLASS_1] = 1;
+        context_ptr->md_stage_1_count[CAND_CLASS_2] = context_ptr->md_stage_2_count[CAND_CLASS_2] = context_ptr->md_stage_3_count[CAND_CLASS_2] = 1;
+        context_ptr->md_stage_1_count[CAND_CLASS_3] = context_ptr->md_stage_2_count[CAND_CLASS_3] = context_ptr->md_stage_3_count[CAND_CLASS_3] = 1;
+        context_ptr->md_stage_1_count[CAND_CLASS_4] = context_ptr->md_stage_2_count[CAND_CLASS_4] = context_ptr->md_stage_3_count[CAND_CLASS_4] = 1;
+        context_ptr->md_stage_1_count[CAND_CLASS_5] = context_ptr->md_stage_2_count[CAND_CLASS_5] = context_ptr->md_stage_3_count[CAND_CLASS_5] = 1;
+        context_ptr->md_stage_1_count[CAND_CLASS_8] = context_ptr->md_stage_2_count[CAND_CLASS_8] = context_ptr->md_stage_3_count[CAND_CLASS_8] = 1;
+#endif
         // Set md_stage_3 NICs
 
         context_ptr->md_stage_3_count[CAND_CLASS_0] =

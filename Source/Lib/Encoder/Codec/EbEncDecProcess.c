@@ -2551,6 +2551,10 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
         context_ptr->md_max_ref_count = 4;
     else if (context_ptr->pd_pass == PD_PASS_1)
         context_ptr->md_max_ref_count = 1;
+#if MRP_MD_OFF
+    else
+    context_ptr->md_max_ref_count = 1;
+#else
 #if M8_CAP_NUMBER_OF_REF_IN_MD
     else if(pcs_ptr->enc_mode <= ENC_M7)
         context_ptr->md_max_ref_count = 4;
@@ -2560,7 +2564,7 @@ EbErrorType signal_derivation_enc_dec_kernel_oq(
     else
         context_ptr->md_max_ref_count = 4;
 #endif
-
+#endif
     // Set md_skip_mvp_generation (and use (0,0) as MVP instead)
     if (context_ptr->pd_pass == PD_PASS_0)
         context_ptr->md_skip_mvp_generation = EB_TRUE;
@@ -3310,6 +3314,11 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
                             e_depth = 1;
 #endif
                         }
+
+#if PRED_DEPTH_ONLY
+                        s_depth = 0;
+                        e_depth = 0;
+#endif
                     }
 
                     // Add current pred depth block(s)
