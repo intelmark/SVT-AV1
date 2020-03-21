@@ -7131,7 +7131,7 @@ void md_stage_3(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *blk_p
              context_ptr->md_staging_mode == MD_STAGING_MODE_2);
 #endif
         context_ptr->md_staging_skip_inter_chroma_pred = EB_FALSE;
-#if MR_MODE
+#if MR_MODE || MODIFIED_REF
         context_ptr->md_staging_tx_size_mode = EB_TRUE;
 #else
         context_ptr->md_staging_tx_size_mode = (candidate_ptr->cand_class == CAND_CLASS_0 || candidate_ptr->cand_class == CAND_CLASS_6 || candidate_ptr->cand_class == CAND_CLASS_7) ? 1 : 0;
@@ -8139,11 +8139,20 @@ void interintra_class_pruning_1(ModeDecisionContext *context_ptr, uint64_t best_
                     context_ptr->fast_lambda_md[EB_10_BIT_MD] :
                     context_ptr->fast_lambda_md[EB_8_BIT_MD];
 
+
                 uint64_t factor;
                 if(cand_class_it == CAND_CLASS_0 || cand_class_it == CAND_CLASS_6 || cand_class_it == CAND_CLASS_7)
+#if TEST_INTRA_CLASSES
+                    factor = COST_TH_FACTOR;
+#else
                     factor = (uint64_t)~0;
+#endif
                 else
+#if TEST_INTER_CLASSES
+                    factor = COST_TH_FACTOR;
+#else
                     factor = (uint64_t)~0;
+#endif
 
                 if(factor != (uint64_t)~0)
                 if (context_ptr->blk_geom->shape != PART_N) {
@@ -8185,8 +8194,10 @@ void interintra_class_pruning_1(ModeDecisionContext *context_ptr, uint64_t best_
 void interintra_class_pruning_2(ModeDecisionContext *context_ptr, uint64_t best_md_stage_cost) {
     for (CandClass cand_class_it = CAND_CLASS_0; cand_class_it < CAND_CLASS_TOTAL;
          cand_class_it++) {
+#if !SHUT_CLASS_POST_MD_SATGE_1_IF_BEST_COST
         if (context_ptr->md_stage_2_3_cand_prune_th != (uint64_t)~0 ||
             context_ptr->md_stage_2_3_class_prune_th != (uint64_t)~0)
+#endif
             if (context_ptr->md_stage_1_count[cand_class_it] > 0 &&
                 context_ptr->md_stage_2_count[cand_class_it] > 0 &&
                 context_ptr->bypass_md_stage_1[cand_class_it] == EB_FALSE) {
@@ -8195,13 +8206,48 @@ void interintra_class_pruning_2(ModeDecisionContext *context_ptr, uint64_t best_
                     *(context_ptr->candidate_buffer_ptr_array[cand_buff_indices[0]]->full_cost_ptr);
 
                 // inter class pruning
+#if SHUT_CLASS_POST_MD_SATGE_1_IF_BEST_COST
+                uint64_t shut_class_norm_cost_th = (uint64_t)~0;
+
+                uint32_t full_lambda = context_ptr->hbd_mode_decision ?
+                    context_ptr->full_lambda_md[EB_10_BIT_MD] :
+                    context_ptr->full_lambda_md[EB_8_BIT_MD];
+
+                uint64_t factor;
+                if (cand_class_it == CAND_CLASS_0 || cand_class_it == CAND_CLASS_6 || cand_class_it == CAND_CLASS_7)
+#if TEST_INTRA_CLASSES
+                    factor = COST_TH_FACTOR;
+#else
+                    factor = (uint64_t)~0;
+#endif
+                else
+#if TEST_INTER_CLASSES
+                    factor = COST_TH_FACTOR;
+#else
+                    factor = (uint64_t)~0;
+#endif
+
+                if (factor != (uint64_t)~0)
+                    if (context_ptr->blk_geom->shape != PART_N) {
+                        shut_class_norm_cost_th = RDCOST(full_lambda, 16, factor * factor * context_ptr->blk_geom->bwidth * context_ptr->blk_geom->bheight);
+                    }
+
+                if (best_md_stage_cost && class_best_cost &&
+                    ((((class_best_cost - best_md_stage_cost) * 100) / best_md_stage_cost) >
+                        context_ptr->md_stage_2_3_class_prune_th) ||
+
+                        (class_best_cost != best_md_stage_cost && class_best_cost > shut_class_norm_cost_th)) {
+                    context_ptr->md_stage_2_count[cand_class_it] = 0;
+                    continue;
+                }
+#else
                 if (best_md_stage_cost && class_best_cost &&
                     ((((class_best_cost - best_md_stage_cost) * 100) / best_md_stage_cost) >
                      context_ptr->md_stage_2_3_class_prune_th)) {
                     context_ptr->md_stage_2_count[cand_class_it] = 0;
                     continue;
                 }
-
+#endif
                 // intra class pruning
                 uint32_t cand_count = 1;
                 uint64_t md_stage_2_3_cand_prune_th = context_ptr->md_stage_2_3_cand_prune_th;
