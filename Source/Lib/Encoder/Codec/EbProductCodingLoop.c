@@ -8121,8 +8121,10 @@ unsigned int                 eb_av1_get_sby_perpixel_variance(const AomVarianceF
 void interintra_class_pruning_1(ModeDecisionContext *context_ptr, uint64_t best_md_stage_cost) {
     for (CandClass cand_class_it = CAND_CLASS_0; cand_class_it < CAND_CLASS_TOTAL;
          cand_class_it++) {
+#if !SHUT_CLASS_POST_MD_SATGE_0_IF_BEST_COST
         if (context_ptr->md_stage_1_cand_prune_th != (uint64_t)~0 ||
             context_ptr->md_stage_1_class_prune_th != (uint64_t)~0)
+#endif
             if (context_ptr->md_stage_0_count[cand_class_it] > 0 &&
                 context_ptr->md_stage_1_count[cand_class_it] > 0) {
                 uint32_t *cand_buff_indices = context_ptr->cand_buff_indices[cand_class_it];
@@ -8130,9 +8132,35 @@ void interintra_class_pruning_1(ModeDecisionContext *context_ptr, uint64_t best_
                     *(context_ptr->candidate_buffer_ptr_array[cand_buff_indices[0]]->fast_cost_ptr);
 
                 // inter class pruning
+#if SHUT_CLASS_POST_MD_SATGE_0_IF_BEST_COST
+                uint64_t shut_class_norm_cost_th = (uint64_t) ~0;
+
+                uint32_t fast_lambda = context_ptr->hbd_mode_decision ?
+                    context_ptr->fast_lambda_md[EB_10_BIT_MD] :
+                    context_ptr->fast_lambda_md[EB_8_BIT_MD];
+
+                uint64_t factor;
+                if(cand_class_it == CAND_CLASS_0 || cand_class_it == CAND_CLASS_6 || cand_class_it == CAND_CLASS_7)
+                    factor = (uint64_t)~0;
+                else
+                    factor = (uint64_t)~0;
+
+                if(factor != (uint64_t)~0)
+                if (context_ptr->blk_geom->shape != PART_N) {
+                    
+                    shut_class_norm_cost_th = RDCOST(fast_lambda, 16, factor * context_ptr->blk_geom->bwidth * context_ptr->blk_geom->bheight);
+                }
+
+                if ((best_md_stage_cost && class_best_cost &&
+                    ((((class_best_cost - best_md_stage_cost) * 100) / best_md_stage_cost) >
+                        context_ptr->md_stage_1_class_prune_th)) || 
+                    
+                    (class_best_cost != best_md_stage_cost && class_best_cost > shut_class_norm_cost_th)) {
+#else
                 if (best_md_stage_cost && class_best_cost &&
                     ((((class_best_cost - best_md_stage_cost) * 100) / best_md_stage_cost) >
                      context_ptr->md_stage_1_class_prune_th)) {
+#endif
                     context_ptr->md_stage_1_count[cand_class_it] = 0;
                     continue;
                 }

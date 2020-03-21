@@ -135,6 +135,10 @@ extern "C" {
 
 #define MODIFIED_REF 1
 
+#define SHUT_CLASS_POST_MD_SATGE_0_IF_BEST_COST 0
+#define SHUT_CLASS_POST_MD_SATGE_1_IF_BEST_COST 0
+
+
 #define PRED_DEPTH_ONLY 0 // Depth
 #define NIC_INTER_CLASSES_1 0 // NICS = 1 for INTER
 #define MRP_MD_OFF 0 // MRP OFF
