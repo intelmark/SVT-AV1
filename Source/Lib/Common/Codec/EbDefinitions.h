@@ -145,8 +145,12 @@ extern "C" {
 #define SHUT_TXS 0// TXS OFF
 #define SHUT_RDOQ 0// RDOQ OFF
 #define SHUT_TXT 0 // TXT OFF
-
-
+// TESTs FOR DTO
+#define INTER_TUNING                0
+#define INTRA_TUNING                0
+#define ABS_TH_BASED_RDOQ_DISABLING 0
+#define ABS_TH_BASED_TXT_DISABLING  0
+#define FACTOR                      10
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
 
 #define COMMON_16BIT 1 // 16Bit pipeline support for common

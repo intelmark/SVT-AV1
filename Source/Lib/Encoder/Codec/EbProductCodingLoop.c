@@ -6626,11 +6626,15 @@ void perform_tx_partitioning(ModeDecisionCandidateBuffer *candidate_buffer,
             }
 
             if (context_ptr->blk_geom->tx_width[context_ptr->tx_depth][context_ptr->txb_itr] <=
-                    32 &&
-                context_ptr->blk_geom->tx_height[context_ptr->tx_depth][context_ptr->txb_itr] <= 32)
+                32 &&
+                context_ptr->blk_geom->tx_height[context_ptr->tx_depth][context_ptr->txb_itr] <= 32) {
+#if ABS_TH_BASED_TXT_DISABLING
+                tx_search_skip_flag = context_ptr->abs_th_skip_txt ? 1 : tx_search_skip_flag;           
+#endif
                 if (!tx_search_skip_flag) {
                     tx_type_search(pcs_ptr, context_ptr, tx_candidate_buffer, qp);
                 }
+            }
 
             product_full_loop(tx_candidate_buffer,
                               context_ptr,
@@ -6742,7 +6746,58 @@ void full_loop_core(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *b
     candidate_ptr->y_has_coeff = 0;
     candidate_ptr->u_has_coeff = 0;
     candidate_ptr->v_has_coeff = 0;
-
+#if ABS_TH_BASED_TXT_DISABLING
+    context_ptr->abs_th_skip_txt = EB_FALSE;
+#endif
+#if ABS_TH_BASED_RDOQ_DISABLING || ABS_TH_BASED_TXT_DISABLING
+    uint8_t default_md_stage_skip_rdoq = context_ptr->md_staging_skip_rdoq;
+    uint32_t width  = context_ptr->blk_geom->bwidth;
+    uint32_t height = context_ptr->blk_geom->bheight; 
+    int32_t is_inter = (candidate_buffer->candidate_ptr->type == INTER_MODE ||
+                            candidate_buffer->candidate_ptr->use_intrabc)
+                               ? EB_TRUE
+                               : EB_FALSE;
+    uint64_t skip_txt_th;
+    if (context_ptr->md_stage == 1) {
+        uint64_t dist_sum = (width * height * FACTOR); // NM: To be tuned
+        uint32_t fast_lambda =  context_ptr->hbd_mode_decision ?
+                context_ptr->fast_lambda_md[EB_10_BIT_MD] :
+                context_ptr->fast_lambda_md[EB_8_BIT_MD];
+        skip_txt_th =  RDCOST(fast_lambda, 16, dist_sum);  
+    }
+    else {
+        uint64_t dist_sum = (width * height * FACTOR*FACTOR);  // NM: To be tuned
+        skip_txt_th =  RDCOST(full_lambda, 16, dist_sum);   
+    }
+#if INTER_TUNING
+    if (is_inter) {
+#if ABS_TH_BASED_RDOQ_DISABLING
+        if (context_ptr->blk_geom->shape != PART_N) {
+            context_ptr->md_staging_skip_rdoq = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->md_staging_skip_rdoq;
+        }
+#endif
+#if ABS_TH_BASED_TXT_DISABLING
+        if (context_ptr->blk_geom->shape != PART_N) {
+            context_ptr->abs_th_skip_txt = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->abs_th_skip_txt;
+        }
+#endif
+    }
+#endif
+#if INTRA_TUNING
+    if (!is_inter) {
+#if ABS_TH_BASED_RDOQ_DISABLING
+        if (context_ptr->blk_geom->shape != PART_N) {
+            context_ptr->md_staging_skip_rdoq = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->md_staging_skip_rdoq;
+        }
+#endif
+#if ABS_TH_BASED_TXT_DISABLING
+        if (context_ptr->blk_geom->shape != PART_N) {
+            context_ptr->abs_th_skip_txt = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->abs_th_skip_txt;
+        }
+#endif
+    }
+#endif
+#endif
     // Initialize tx type
     for (int tu_index = 0; tu_index < MAX_TXB_COUNT; tu_index++)
         candidate_ptr->transform_type[tu_index] = DCT_DCT;
@@ -6764,11 +6819,13 @@ void full_loop_core(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *b
         else
             end_tx_depth = 0;
     }
+#if !ABS_TH_BASED_RDOQ_DISABLING && !ABS_TH_BASED_TXT_DISABLING
     // Transform partitioning path (INTRA Luma)
         int32_t is_inter = (candidate_buffer->candidate_ptr->type == INTER_MODE ||
                             candidate_buffer->candidate_ptr->use_intrabc)
                                ? EB_TRUE
                                : EB_FALSE;
+#endif
 
         //Y Residual: residual for INTRA is computed inside the TU loop
         if (is_inter)
@@ -6923,6 +6980,9 @@ void full_loop_core(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *b
                                                               &cb_coeff_bits,
                                                               &cr_coeff_bits,
                                                               context_ptr->blk_geom->bsize);
+#if ABS_TH_BASED_RDOQ_DISABLING
+    context_ptr->md_staging_skip_rdoq = default_md_stage_skip_rdoq;
+#endif
 }
 void md_stage_1(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *blk_ptr,
                 ModeDecisionContext *context_ptr, EbPictureBufferDesc *input_picture_ptr,

@@ -408,6 +408,9 @@ typedef struct ModeDecisionContext {
     EbBool md_staging_tx_search; // 0: skip, 1: use ref cost, 2: no shortcuts
     EbBool md_staging_skip_full_chroma;
     EbBool md_staging_skip_rdoq;
+#if ABS_TH_BASED_TXT_DISABLING
+    EbBool abs_th_skip_txt;
+#endif
     EbBool md_staging_spatial_sse_full_loop;
     DECLARE_ALIGNED(
         16, uint8_t,
