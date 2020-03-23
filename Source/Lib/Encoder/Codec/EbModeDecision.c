@@ -5984,38 +5984,38 @@ EbErrorType generate_md_stage_0_cand(
 }
     //----------------------
     // Intra
-    if (context_ptr->blk_geom->sq_size < 128) {
-        if (!context_ptr->dc_cand_only_flag && !coeff_based_nsq_cand_reduction && pcs_ptr->parent_pcs_ptr->intra_pred_mode >= 5 && context_ptr->blk_geom->sq_size > 4 && context_ptr->blk_geom->shape == PART_N)
-            inject_intra_candidates_ois(
-                pcs_ptr,
-                context_ptr,
-                sb_ptr,
-                &cand_total_cnt);
-        else
+        if (context_ptr->blk_geom->sq_size < 128) {
+            if (!context_ptr->dc_cand_only_flag && !coeff_based_nsq_cand_reduction && pcs_ptr->parent_pcs_ptr->intra_pred_mode >= 5 && context_ptr->blk_geom->sq_size > 4 && context_ptr->blk_geom->shape == PART_N)
+                inject_intra_candidates_ois(
+                    pcs_ptr,
+                    context_ptr,
+                    sb_ptr,
+                    &cand_total_cnt);
+            else
                 inject_intra_candidates(
                     pcs_ptr,
                     context_ptr,
                     scs_ptr,
                     sb_ptr,
                     context_ptr->dc_cand_only_flag || coeff_based_nsq_cand_reduction,
-                &cand_total_cnt);
-    }
-    if (!coeff_based_nsq_cand_reduction)
-       if (context_ptr->md_filter_intra_mode > 0 && av1_filter_intra_allowed_bsize(scs_ptr->seq_header.enable_filter_intra, context_ptr->blk_geom->bsize))
+                    &cand_total_cnt);
+        }
+        if (!coeff_based_nsq_cand_reduction)
+            if (context_ptr->md_filter_intra_mode > 0 && av1_filter_intra_allowed_bsize(scs_ptr->seq_header.enable_filter_intra, context_ptr->blk_geom->bsize))
 
-            inject_filter_intra_candidates(
+                inject_filter_intra_candidates(
+                    pcs_ptr,
+                    context_ptr,
+                    &cand_total_cnt);
+
+        if (frm_hdr->allow_intrabc)
+            inject_intra_bc_candidates(
                 pcs_ptr,
                 context_ptr,
-                &cand_total_cnt);
-
-    if (frm_hdr->allow_intrabc)
-        inject_intra_bc_candidates(
-            pcs_ptr,
-            context_ptr,
-            scs_ptr,
-            context_ptr->blk_ptr,
-            &cand_total_cnt
-        );
+                scs_ptr,
+                context_ptr->blk_ptr,
+                &cand_total_cnt
+            );
 
     //can be removed later if need be
     for (uint16_t i = 0; i < cand_total_cnt; i++) {

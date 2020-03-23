@@ -159,6 +159,7 @@ extern "C" {
 #define ABS_TH_BASED_RDOQ_DISABLING 0
 #define ABS_TH_BASED_TXT_DISABLING  0
 #define FACTOR                      10
+#define HIGH_COMPLEX_SB_DETECT      0
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////
 
 #define COMMON_16BIT 1 // 16Bit pipeline support for common

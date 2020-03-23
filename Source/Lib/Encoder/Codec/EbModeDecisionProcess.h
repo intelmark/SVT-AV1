@@ -485,6 +485,9 @@ typedef struct ModeDecisionContext {
 #if UV_SEARCH_MODE_INJCECTION
     uint8_t       intra_chroma_search_follows_intra_luma_injection;
 #endif
+#if HIGH_COMPLEX_SB_DETECT
+    uint8_t       high_complex_sb;
+#endif
 } ModeDecisionContext;
 
 typedef void (*EbAv1LambdaAssignFunc)(uint32_t *fast_lambda, uint32_t *full_lambda,

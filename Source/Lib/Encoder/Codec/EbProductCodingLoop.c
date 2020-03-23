@@ -6770,7 +6770,11 @@ void full_loop_core(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *b
         skip_txt_th =  RDCOST(full_lambda, 16, dist_sum);   
     }
 #if INTER_TUNING
+#if HIGH_COMPLEX_SB_DETECT
+    if (is_inter && context_ptr->high_complex_sb == 2) {
+#else
     if (is_inter) {
+#endif
 #if ABS_TH_BASED_RDOQ_DISABLING
         if (context_ptr->blk_geom->shape != PART_N) {
             context_ptr->md_staging_skip_rdoq = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->md_staging_skip_rdoq;
@@ -6784,7 +6788,11 @@ void full_loop_core(PictureControlSet *pcs_ptr, SuperBlock *sb_ptr, BlkStruct *b
     }
 #endif
 #if INTRA_TUNING
+#if HIGH_COMPLEX_SB_DETECT
+    if (!is_inter && context_ptr->high_complex_sb == 1) {
+#else
     if (!is_inter) {
+#endif
 #if ABS_TH_BASED_RDOQ_DISABLING
         if (context_ptr->blk_geom->shape != PART_N) {
             context_ptr->md_staging_skip_rdoq = (*candidate_buffer->full_cost_ptr > skip_txt_th) ? 1 : context_ptr->md_staging_skip_rdoq;
@@ -9373,6 +9381,28 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
     Part     nsq_shape_table[NUMBER_OF_SHAPES] = {
         PART_N, PART_H, PART_V, PART_HA, PART_HB, PART_VA, PART_VB, PART_H4, PART_V4, PART_S};
     uint8_t skip_next_depth = 0;
+#if HIGH_COMPLEX_SB_DETECT
+        uint8_t default_md_max_ref_count = context_ptr->md_max_ref_count;
+        uint8_t default_predictive_me_level = context_ptr->predictive_me_level;
+        uint8_t default_new_nearest_near_comb_injection = context_ptr->new_nearest_near_comb_injection;
+        uint8_t default_md_pic_obmc_mode = context_ptr->md_pic_obmc_mode;
+        uint8_t default_md_filter_intra_mode = context_ptr->md_filter_intra_mode;
+        uint8_t default_md_intra_angle_delta = context_ptr->md_intra_angle_delta;
+        uint8_t default_disable_angle_z2_intra_flag = context_ptr->disable_angle_z2_intra_flag;
+        if (context_ptr->pd_pass == PD_PASS_2) {
+            if (context_ptr->high_complex_sb == 2) {
+                context_ptr->md_max_ref_count = 1;
+                context_ptr->predictive_me_level = 0;
+                context_ptr->new_nearest_near_comb_injection = 0;
+                context_ptr->md_pic_obmc_mode = 0;
+            }else if (context_ptr->high_complex_sb == 1) {
+                context_ptr->md_filter_intra_mode = 0;
+                context_ptr->md_intra_angle_delta = 0;
+                context_ptr->disable_angle_z2_intra_flag = EB_TRUE;
+
+            }
+        }
+#endif
     do {
         blk_idx_mds = leaf_data_array[blk_index].mds_idx;
 
@@ -9735,6 +9765,15 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
             depth_cost[depth_idx] < 0 ? MAX_MODE_COST : depth_cost[depth_idx];
     }
 
+#if HIGH_COMPLEX_SB_DETECT
+        context_ptr->md_max_ref_count = default_md_max_ref_count;
+        context_ptr->predictive_me_level = default_predictive_me_level;
+        context_ptr->new_nearest_near_comb_injection = default_new_nearest_near_comb_injection;
+        context_ptr->md_pic_obmc_mode = default_md_pic_obmc_mode;
+        context_ptr->md_filter_intra_mode = default_md_filter_intra_mode;
+        context_ptr->md_intra_angle_delta = default_md_intra_angle_delta;
+        context_ptr->disable_angle_z2_intra_flag = default_disable_angle_z2_intra_flag;
+#endif
     return return_error;
 }
 #define MAX_SEARCH_POINT_WIDTH 128
