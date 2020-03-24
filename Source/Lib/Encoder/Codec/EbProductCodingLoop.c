@@ -7597,6 +7597,11 @@ EbErrorType signal_derivation_block(
             context_ptr->inject_inter_candidates = is_src_intra ? 0 : context_ptr->inject_inter_candidates;
     }
 
+#if HIGH_COMPLEX_SB_DETECT
+    if (context_ptr->pd_pass == PD_PASS_2)
+        if (context_ptr->high_complex_sb == 2)
+            context_ptr->compound_types_to_try = MD_COMP_AVG;
+#endif
     return return_error;
 }
 
@@ -9389,12 +9394,14 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
         uint8_t default_md_filter_intra_mode = context_ptr->md_filter_intra_mode;
         uint8_t default_md_intra_angle_delta = context_ptr->md_intra_angle_delta;
         uint8_t default_disable_angle_z2_intra_flag = context_ptr->disable_angle_z2_intra_flag;
+        uint8_t default_warped_motion_injection = context_ptr->warped_motion_injection;
         if (context_ptr->pd_pass == PD_PASS_2) {
             if (context_ptr->high_complex_sb == 2) {
                 context_ptr->md_max_ref_count = 1;
                 context_ptr->predictive_me_level = 0;
                 context_ptr->new_nearest_near_comb_injection = 0;
                 context_ptr->md_pic_obmc_mode = 0;
+                context_ptr->warped_motion_injection = 0;
             }else if (context_ptr->high_complex_sb == 1) {
                 context_ptr->md_filter_intra_mode = 0;
                 context_ptr->md_intra_angle_delta = 0;
@@ -9773,6 +9780,7 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
         context_ptr->md_filter_intra_mode = default_md_filter_intra_mode;
         context_ptr->md_intra_angle_delta = default_md_intra_angle_delta;
         context_ptr->disable_angle_z2_intra_flag = default_disable_angle_z2_intra_flag;
+        context_ptr->warped_motion_injection = default_warped_motion_injection;
 #endif
     return return_error;
 }
