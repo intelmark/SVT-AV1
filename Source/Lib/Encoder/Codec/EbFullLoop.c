@@ -3037,6 +3037,9 @@ EbBool merge_1d_inter_block(ModeDecisionContext *context_ptr, uint32_t sq_idx, u
 uint64_t d1_non_square_block_decision(ModeDecisionContext *context_ptr, uint32_t d1_block_itr) {
     //compute total cost for the whole block partition
     uint64_t tot_cost = 0;
+#if USE_DISTORTION_ONLY
+    uint64_t tot_distortion = 0;
+#endif
     uint32_t first_blk_idx =
         context_ptr->blk_ptr->mds_idx -
         (context_ptr->blk_geom->totns - 1); //index of first block in this partition
@@ -3048,6 +3051,9 @@ uint64_t d1_non_square_block_decision(ModeDecisionContext *context_ptr, uint32_t
         context_ptr->full_lambda_md[EB_8_BIT_MD];
     for (blk_it = 0; blk_it < context_ptr->blk_geom->totns; blk_it++) {
         tot_cost += context_ptr->md_local_blk_unit[first_blk_idx + blk_it].cost;
+#if USE_DISTORTION_ONLY
+        tot_distortion += context_ptr->md_local_blk_unit[first_blk_idx + blk_it].full_distortion;
+#endif
         if (context_ptr->blk_geom->sqi_mds != first_blk_idx + blk_it)
             if (context_ptr->md_local_blk_unit[context_ptr->blk_geom->sqi_mds].avail_blk_flag)
                 merge_block_cnt += merge_1d_inter_block(
@@ -3074,7 +3080,9 @@ uint64_t d1_non_square_block_decision(ModeDecisionContext *context_ptr, uint32_t
          merge_block_flag == EB_FALSE)) {
         //store best partition cost in parent square
         context_ptr->md_local_blk_unit[context_ptr->blk_geom->sqi_mds].cost = tot_cost;
-
+#if USE_DISTORTION_ONLY
+        context_ptr->md_local_blk_unit[context_ptr->blk_geom->sqi_mds].full_distortion = tot_distortion;
+#endif
 #if CLEAN_UP_SB_DATA_1
         context_ptr->md_local_blk_unit[context_ptr->blk_geom->sqi_mds].best_d1_blk = first_blk_idx;
 #else

@@ -10019,15 +10019,25 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                     context_ptr->full_lambda_md[EB_10_BIT_MD] :
                     context_ptr->full_lambda_md[EB_8_BIT_MD];
 
+#if USE_DISTORTION_ONLY
+                uint64_t min_norm_cost_th = D2_MIN_COST_FACTOR * D2_MIN_COST_FACTOR *
+                    get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight;
+
+                uint64_t max_norm_cost_th = D2_MAX_COST_FACTOR * D2_MAX_COST_FACTOR *
+                    get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight;
+#else
                 uint64_t min_norm_cost_th = RDCOST(full_lambda, 16, D2_MIN_COST_FACTOR * D2_MIN_COST_FACTOR *
                     get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight);
 
                 uint64_t max_norm_cost_th = RDCOST(full_lambda, 16, D2_MAX_COST_FACTOR * D2_MAX_COST_FACTOR *
                     get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight);
+#endif
 
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
-#if STOP_IF_ZERO_COEF
+#if USE_DISTORTION_ONLY
+                    if (context_ptr->md_local_blk_unit[last_blk_index_mds].full_distortion < min_norm_cost_th) {
+#elif STOP_IF_ZERO_COEF
                     if (!context_ptr->blk_ptr->block_has_coeff) {
 #elif TEST_MIN
                     if (context_ptr->md_local_blk_unit[last_blk_index_mds].cost < min_norm_cost_th) {
