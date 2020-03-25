@@ -148,6 +148,16 @@ extern "C" {
 #define NEAREST_NEAR_REF_MASKING 1
 #define PRED_ME_REF_MASKING 1
 #endif
+#define MODIFIED_M8 1
+#define BLOCK_BASED_DEPTH_REDUCTION 0
+#if BLOCK_BASED_DEPTH_REDUCTION
+
+#define TEST_MIN 1
+#define D2_MIN_COST_FACTOR  5
+
+#define TEST_MAX 0
+#define D2_MAX_COST_FACTOR 20
+#endif
 #endif
 
 // END  BEYOND_CS2 /////////////////////////////////////////////////////////

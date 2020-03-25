@@ -966,6 +966,9 @@ EbErrorType signal_derivation_multi_processes_oq(
     pcs_ptr->disallow_4x4 = EB_FALSE;
 
     // Set disallow_all_nsq_blocks_below_8x8: 8x4, 4x8
+#if MODIFIED_M8
+    pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_FALSE;
+#else
     if (sc_content_detected) {
         pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_FALSE;
     }
@@ -979,7 +982,7 @@ EbErrorType signal_derivation_multi_processes_oq(
         else
             pcs_ptr->disallow_all_nsq_blocks_below_8x8 = EB_TRUE;
     }
-
+#endif
     // Set disallow_all_nsq_blocks_below_16x16: 16x8, 8x16, 16x4, 4x16
     pcs_ptr->disallow_all_nsq_blocks_below_16x16 = EB_FALSE;
 

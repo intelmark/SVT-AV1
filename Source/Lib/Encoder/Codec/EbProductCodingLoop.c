@@ -10011,6 +10011,37 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                     sb_origin_x,
                     sb_origin_y);
             }
+#if BLOCK_BASED_DEPTH_REDUCTION
+            // stop break-down if current cost is good enough
+            uint32_t full_lambda = context_ptr->hbd_mode_decision ?
+                context_ptr->full_lambda_md[EB_10_BIT_MD] :
+                context_ptr->full_lambda_md[EB_8_BIT_MD];
+
+
+
+            uint64_t min_norm_cost_th = RDCOST(full_lambda, 16, D2_MIN_COST_FACTOR * D2_MIN_COST_FACTOR *
+                get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight);
+
+            uint64_t max_norm_cost_th = RDCOST(full_lambda, 16, D2_MAX_COST_FACTOR * D2_MAX_COST_FACTOR *
+                get_blk_geom_mds(last_blk_index_mds)->bwidth * get_blk_geom_mds(last_blk_index_mds)->bheight);
+
+           
+            if (context_ptr->pd_pass == PD_PASS_2) {
+#if TEST_MIN
+                if (context_ptr->md_local_blk_unit[last_blk_index_mds].cost < min_norm_cost_th) {
+#elif TEST_MAX
+                if (get_blk_geom_mds(last_blk_index_mds)->sq_size <= 8 && context_ptr->md_local_blk_unit[last_blk_index_mds].cost > max_norm_cost_th) {
+#else
+                if(0) {
+#endif
+                    set_child_to_be_skipped(
+                        context_ptr,
+                        get_blk_geom_mds(last_blk_index_mds)->sqi_mds,
+                        scs_ptr->seq_header.sb_size,
+                        scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                }               
+            }
+#endif
         } else if (d1_first_block)
             d1_first_block = 0;
         blk_index++;
