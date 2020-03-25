@@ -9661,6 +9661,10 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
     Part     nsq_shape_table[NUMBER_OF_SHAPES] = {
         PART_N, PART_H, PART_V, PART_HA, PART_HB, PART_VA, PART_VB, PART_H4, PART_V4, PART_S};
     uint8_t skip_next_depth = 0;
+
+#if COST_DEVIATION_CHECK
+    uint64_t parent_depth_cost[NUMBER_OF_DEPTH] = {MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST };
+#endif
     do {
         blk_idx_mds = leaf_data_array[blk_index].mds_idx;
 
@@ -10011,7 +10015,35 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                     sb_origin_x,
                     sb_origin_y);
             }
-#if BLOCK_BASED_DEPTH_REDUCTION
+#if COST_DEVIATION_CHECK
+            else if (context_ptr->md_blk_arr_nsq[blk_geom->sqi_mds].split_flag == EB_TRUE &&  // not last depth = might further split
+                     blk_geom->depth && // not 1st depth
+                context_ptr->md_local_blk_unit[blk_geom->sqi_mds].avail_blk_flag
+  // valid block
+                ) { // not 1st depth=cost available
+                // @ this stage d1 is performed but not d2
+                // stop break-down if current cost is good enough
+                //get parent idx
+
+                
+
+                if (context_ptr->pd_pass == PD_PASS_2) {
+                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
+                        set_child_to_be_skipped(
+                            context_ptr,
+                            get_blk_geom_mds(last_blk_index_mds)->sqi_mds,
+                            scs_ptr->seq_header.sb_size,
+                            scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                    }
+                }
+            }
+
+            parent_depth_cost[blk_geom->depth] =
+                (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].avail_blk_flag)
+                    ? context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost
+                    : parent_depth_cost[blk_geom->depth];
+
+#elif BLOCK_BASED_DEPTH_REDUCTION
             else if (context_ptr->md_blk_arr_nsq[last_blk_index_mds].split_flag == EB_TRUE) {
                 // @ this stage d1 is performed but not d2
                 // stop break-down if current cost is good enough

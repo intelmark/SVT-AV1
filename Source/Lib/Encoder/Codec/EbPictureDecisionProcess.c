@@ -848,6 +848,10 @@ EbErrorType signal_derivation_multi_processes_oq(
         (pcs_ptr->slice_type == I_SLICE)
         ? MULTI_PASS_PD_LEVEL_1
         : MULTI_PASS_PD_LEVEL_2;
+
+#if CHECK_ALL_DEPTH
+    pcs_ptr->multi_pass_pd_level = MULTI_PASS_PD_OFF;
+#endif
 #else
     if (sc_content_detected)
 #if MAR19_ADOPTIONS
