@@ -10028,10 +10028,10 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                 
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
-                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
+                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > 2 * parent_depth_cost[blk_geom->depth - 1]) {
                         set_child_to_be_skipped(
                             context_ptr,
-                            get_blk_geom_mds(last_blk_index_mds)->sqi_mds,
+                            blk_geom->sqi_mds,
                             scs_ptr->seq_header.sb_size,
                             scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
                     }
