@@ -149,7 +149,8 @@ extern "C" {
 #define PRED_ME_REF_MASKING 1
 #endif
 #define MODIFIED_M8 1
-#define CHECK_ALL_DEPTH 1
+#define CHECK_ALL_DEPTH 0
+#define MULTI_PASS_PD_MINUS_3_PLUS_3 1
 
 #define COST_DEVIATION_CHECK 1
 

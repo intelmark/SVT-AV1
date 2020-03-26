@@ -10028,7 +10028,7 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                 
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
-                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > 2 * parent_depth_cost[blk_geom->depth - 1]) {
+                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
                         set_child_to_be_skipped(
                             context_ptr,
                             blk_geom->sqi_mds,

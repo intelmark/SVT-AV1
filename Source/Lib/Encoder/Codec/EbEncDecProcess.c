@@ -4794,6 +4794,11 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
                             e_depth = 1;
 #endif
                         }
+
+#if MULTI_PASS_PD_MINUS_3_PLUS_3
+                        s_depth = -3;
+                        e_depth =  3;
+#endif
                     }
 
                     // Add current pred depth block(s)
