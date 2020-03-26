@@ -10063,10 +10063,10 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                         }
 
 
-                        //EbBool skip_check = (is_parent_depth_block_intra == EB_FALSE && is_current_depth_block_intra == EB_TRUE);
+                        EbBool skip_check = (is_parent_depth_block_intra == EB_FALSE && is_current_depth_block_intra == EB_TRUE);
 
                         //if(is_current_depth_block_intra == EB_FALSE)
-                        //if(!skip_check)
+                        if(!skip_check)
 #if USE_TWO_AS_AND
                         if (current_depth_has_coeff == EB_FALSE &&
                             (
