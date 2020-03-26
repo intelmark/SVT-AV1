@@ -10052,9 +10052,10 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                             }
                         }
 
-                        //EbBool is_parent_depth_block_intra = (is_parent_depth_block_intra == EB_FALSE && is_current_depth_block_intra == EB_TRUE);
+                        EbBool skip_check = (is_parent_depth_block_intra == EB_FALSE && is_current_depth_block_intra == EB_TRUE);
 
-                        if(is_current_depth_block_intra == EB_FALSE)
+                        //if(is_current_depth_block_intra == EB_FALSE)
+                        if(!skip_check)
                         if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
 
                         {
