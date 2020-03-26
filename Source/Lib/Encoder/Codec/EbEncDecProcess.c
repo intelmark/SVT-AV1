@@ -4796,8 +4796,8 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
                         }
 
 #if MULTI_PASS_PD_MINUS_3_PLUS_3
-                        s_depth = -3;
-                        e_depth =  3;
+                        s_depth = -2;
+                        e_depth =  2;
 #endif
                     }
 
