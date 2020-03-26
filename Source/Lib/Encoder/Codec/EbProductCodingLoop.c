@@ -10024,24 +10024,46 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
 
 
                 //Set parent to be considered
-                uint32_t parent_depth_idx_mds =
+                uint32_t parent_depth_sqi_mds =
                     (blk_geom->sqi_mds -
                     (blk_geom->quadi - 3) * ns_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth]) -
                     parent_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth];
 
-                if (context_ptr->pd_pass == PD_PASS_2) {
+                if (context_ptr->md_local_blk_unit[parent_depth_sqi_mds].avail_blk_flag) {
+                    if (context_ptr->pd_pass == PD_PASS_2) {
 
-                    if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
+                        // Get the current depth block type
+                        uint32_t current_depth_best_d1_blk_mds = context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk;
+                        BlkStruct *current_depth_best_d1_blk_ptr = &(context_ptr->md_blk_arr_nsq[current_depth_best_d1_blk_mds]);
+                        EbBool is_current_depth_block_intra = EB_FALSE;
+                        {
+                            for (int32_t d1_itr = 0; d1_itr < get_blk_geom_mds(current_depth_best_d1_blk_mds)->totns; d1_itr++) {
+                                is_current_depth_block_intra |= (current_depth_best_d1_blk_ptr[d1_itr].prediction_mode_flag == INTRA_MODE);
+                            }
+                        }
 
-                    if (context_ptr->md_local_blk_unit[parent_depth_idx_mds].avail_blk_flag) {
-                        if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > ((context_ptr->md_local_blk_unit[parent_depth_idx_mds].cost * 150) / 100)) {
+                        // Get the parent depth block type
+                        uint32_t parent_depth_best_d1_blk_mds = context_ptr->md_local_blk_unit[parent_depth_sqi_mds].best_d1_blk;
+                        BlkStruct *parent_depth_best_d1_blk_ptr = &(context_ptr->md_blk_arr_nsq[parent_depth_best_d1_blk_mds]);
+                        EbBool is_parent_depth_block_intra = EB_FALSE;
+                        {
+                            for (int32_t d1_itr = 0; d1_itr < get_blk_geom_mds(parent_depth_best_d1_blk_mds)->totns; d1_itr++) {
+                                is_parent_depth_block_intra |= (parent_depth_best_d1_blk_ptr[d1_itr].prediction_mode_flag == INTRA_MODE);
+                            }
+                        }
 
-                            //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
-                            set_child_to_be_skipped(
-                                context_ptr,
-                                blk_geom->sqi_mds,
-                                scs_ptr->seq_header.sb_size,
-                                scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                        if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
+
+                        {
+                            if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > ((context_ptr->md_local_blk_unit[parent_depth_sqi_mds].cost * 100) / 100)) {
+
+                                //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
+                                set_child_to_be_skipped(
+                                    context_ptr,
+                                    blk_geom->sqi_mds,
+                                    scs_ptr->seq_header.sb_size,
+                                    scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                            }
                         }
                     }
                 }
