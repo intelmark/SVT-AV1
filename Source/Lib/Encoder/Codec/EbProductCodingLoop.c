@@ -10042,6 +10042,16 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                             }
                         }
 
+
+                        EbBool current_depth_has_coeff = EB_FALSE;
+                        {
+                            for (int32_t d1_itr = 0; d1_itr < get_blk_geom_mds(current_depth_best_d1_blk_mds)->totns; d1_itr++) {
+                                current_depth_has_coeff |= (current_depth_best_d1_blk_ptr[d1_itr].block_has_coeff);
+                            }
+                        }
+
+
+
                         // Get the parent depth block type
                         uint32_t parent_depth_best_d1_blk_mds = context_ptr->md_local_blk_unit[parent_depth_sqi_mds].best_d1_blk;
                         BlkStruct *parent_depth_best_d1_blk_ptr = &(context_ptr->md_blk_arr_nsq[parent_depth_best_d1_blk_mds]);
@@ -10052,14 +10062,23 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                             }
                         }
 
+
                         //EbBool skip_check = (is_parent_depth_block_intra == EB_FALSE && is_current_depth_block_intra == EB_TRUE);
 
                         //if(is_current_depth_block_intra == EB_FALSE)
                         //if(!skip_check)
-                        if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
 
+#if USE_COEFF_INFO
+                        if(current_depth_has_coeff == EB_FALSE)
+#endif
+#if USE_COST_SQ_VS_NSQ
+                        if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
+#endif
                         {
-                            if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > ((context_ptr->md_local_blk_unit[parent_depth_sqi_mds].cost * 100) / 100)) {
+#if USE_COST_SQ_VS_NSQ
+                            if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > ((context_ptr->md_local_blk_unit[parent_depth_sqi_mds].cost * 100) / 100))
+#endif
+                            {
 
                                 //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
                                 set_child_to_be_skipped(
