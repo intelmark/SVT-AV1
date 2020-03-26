@@ -4794,7 +4794,10 @@ static void perform_pred_depth_refinement(SequenceControlSet *scs_ptr, PictureCo
                             e_depth = 1;
 #endif
                         }
-
+#if REMOVE_THE_PD_SQ_VS_NSQ_CHECK
+                        s_depth = (blk_geom->sq_size == 64 && pcs_ptr->parent_pcs_ptr->sb_64x64_simulated) ? 0 : -1;
+                        e_depth = (blk_geom->sq_size == 8 && pcs_ptr->parent_pcs_ptr->disallow_4x4) ? 0 : 1;
+#endif
 #if MULTI_PASS_PD_MINUS_3_PLUS_3
                         s_depth = -3;
                         e_depth =  3;
