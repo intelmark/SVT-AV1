@@ -9663,7 +9663,7 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
     uint8_t skip_next_depth = 0;
 
 #if COST_DEVIATION_CHECK
-    uint64_t parent_depth_cost[NUMBER_OF_DEPTH] = {MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST };
+    //uint64_t parent_depth_cost[NUMBER_OF_DEPTH] = {MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST };
 #endif
     do {
         blk_idx_mds = leaf_data_array[blk_index].mds_idx;
@@ -10025,23 +10025,31 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                 // stop break-down if current cost is good enough
                 //get parent idx
 
-                
+
+                //Set parent to be considered
+                uint32_t parent_depth_idx_mds =
+                    (blk_geom->sqi_mds -
+                    (blk_geom->quadi - 3) * ns_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth]) -
+                    parent_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth];
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
-                    if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
-                        set_child_to_be_skipped(
-                            context_ptr,
-                            blk_geom->sqi_mds,
-                            scs_ptr->seq_header.sb_size,
-                            scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                    if (context_ptr->md_local_blk_unit[parent_depth_idx_mds].avail_blk_flag) {
+                        if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > context_ptr->md_local_blk_unit[parent_depth_idx_mds].cost) {
+                            //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
+                            set_child_to_be_skipped(
+                                context_ptr,
+                                blk_geom->sqi_mds,
+                                scs_ptr->seq_header.sb_size,
+                                scs_ptr->seq_header.sb_size == BLOCK_128X128 ? 6 : 5);
+                        }
                     }
                 }
             }
 
-            parent_depth_cost[blk_geom->depth] =
-                (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].avail_blk_flag)
-                    ? context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost
-                    : parent_depth_cost[blk_geom->depth];
+            //parent_depth_cost[blk_geom->depth] =
+            //    (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].avail_blk_flag)
+            //        ? context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost
+            //        : MAX_CU_COST;
 
 #elif BLOCK_BASED_DEPTH_REDUCTION
             else if (context_ptr->md_blk_arr_nsq[last_blk_index_mds].split_flag == EB_TRUE) {
