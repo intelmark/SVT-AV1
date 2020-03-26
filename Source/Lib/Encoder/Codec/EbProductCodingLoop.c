@@ -10033,6 +10033,10 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                     parent_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth];
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
+#if PAUSE_ONLY_IF_SELECTED_SQ
+                    if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
+#endif
+
                     if (context_ptr->md_local_blk_unit[parent_depth_idx_mds].avail_blk_flag) {
                         if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > context_ptr->md_local_blk_unit[parent_depth_idx_mds].cost) {
                             //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
