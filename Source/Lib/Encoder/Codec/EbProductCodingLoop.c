@@ -9662,9 +9662,6 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
         PART_N, PART_H, PART_V, PART_HA, PART_HB, PART_VA, PART_VB, PART_H4, PART_V4, PART_S};
     uint8_t skip_next_depth = 0;
 
-#if COST_DEVIATION_CHECK
-    //uint64_t parent_depth_cost[NUMBER_OF_DEPTH] = {MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST, MAX_CU_COST };
-#endif
     do {
         blk_idx_mds = leaf_data_array[blk_index].mds_idx;
 
@@ -10033,16 +10030,12 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
                     parent_depth_offset[scs_ptr->seq_header.sb_size == BLOCK_128X128][blk_geom->depth];
 
                 if (context_ptr->pd_pass == PD_PASS_2) {
-#if PAUSE_ONLY_IF_SELECTED_SQ
+
                     if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
-#endif
-#if REMOVE_COST_CHECK 
-                    {
-                        {
-#else
+
                     if (context_ptr->md_local_blk_unit[parent_depth_idx_mds].avail_blk_flag) {
                         if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > context_ptr->md_local_blk_unit[parent_depth_idx_mds].cost) {
-#endif
+
                             //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
                             set_child_to_be_skipped(
                                 context_ptr,
