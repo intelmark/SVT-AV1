@@ -10036,9 +10036,13 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
 #if PAUSE_ONLY_IF_SELECTED_SQ
                     if (context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds)
 #endif
-
+#if REMOVE_COST_CHECK 
+                    {
+                        {
+#else
                     if (context_ptr->md_local_blk_unit[parent_depth_idx_mds].avail_blk_flag) {
                         if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > context_ptr->md_local_blk_unit[parent_depth_idx_mds].cost) {
+#endif
                             //if ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > parent_depth_cost[blk_geom->depth - 1]) {
                             set_child_to_be_skipped(
                                 context_ptr,
