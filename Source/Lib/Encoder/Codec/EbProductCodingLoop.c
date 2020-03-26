@@ -10067,7 +10067,13 @@ EB_EXTERN EbErrorType mode_decision_sb(SequenceControlSet *scs_ptr, PictureContr
 
                         //if(is_current_depth_block_intra == EB_FALSE)
                         //if(!skip_check)
+#if USE_TWO_AS_AND
+                        if (current_depth_has_coeff == EB_FALSE &&
+                            (
 
+                                context_ptr->md_local_blk_unit[blk_geom->sqi_mds].best_d1_blk == blk_geom->sqi_mds &&
+                                ((context_ptr->md_local_blk_unit[blk_geom->sqi_mds].cost * 4) > ((context_ptr->md_local_blk_unit[parent_depth_sqi_mds].cost * 100) / 100))))
+#endif
 
 #if USE_TWO_AS_OR
                         if (current_depth_has_coeff == EB_FALSE || 
