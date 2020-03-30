@@ -2552,6 +2552,7 @@ EbErrorType read_command_line(int32_t argc, char *const argv[], EbConfig **confi
     uint32_t    warning_index       = -1;
     // Parse command line for tokens
     while (config_entry[++token_index].name != NULL) {
+
         if (config_entry[token_index].type == SINGLE_INPUT) {
             char message[WARNING_LENGTH] = "";
             // concat strings with '-'
